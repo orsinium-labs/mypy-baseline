@@ -143,7 +143,7 @@ COMMANDS: Mapping[str, Command] = {
 def main(argv: list[str], stdin: TextIO, stdout: TextIO) -> int:
     exe = Path(sys.executable).name
     parser = ArgumentParser(f'mypy --show-codes | {exe} -m mypy_baseline')
-    parser.add_argument('cmd', default='filter', choices=sorted(COMMANDS))
+    parser.add_argument('cmd', choices=sorted(COMMANDS))
     Config.init_parser(parser)
     args = parser.parse_args(argv)
     cmd = COMMANDS[args.cmd]

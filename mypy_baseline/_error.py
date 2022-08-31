@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from ._config import Config
 
 COLOR_PATTERN = '(\x1b\\[\\d*m?|\x0f)*'
+REX_COLOR = re.compile(COLOR_PATTERN)
 REX_LINE = re.compile(rf"""
     (?P<path>.+\.py):
     (?P<lineno>[0-9]+):\s
@@ -56,4 +57,5 @@ class Error:
     def get_clean_line(self, config: Config) -> str:
         path = Path(*self.path.parts[:config.depth])
         pos = self.line_number if config.preserve_position else 0
-        return f'{path}:{pos}: {self.severity}: {self.message}  [{self.category}]'
+        msg = REX_COLOR.sub('', self.message)
+        return f'{path}:{pos}: {self.severity}: {msg}  [{self.category}]'
