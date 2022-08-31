@@ -12,6 +12,25 @@ RED = '\033[31m'
 GREEN = '\033[32m'
 BLUE = '\033[94m'
 END = '\033[0m'
+
+EXE = Path(sys.executable).name
+CMD = f'mypy --show-codes | {EXE} -m mypy_baseline'
+
+NEW_ERRORS = """
+    ┌────────────────────────────────────────────┄┄
+    │ {red}Your changes introduced new violations.{end}
+    │ Please, resolve the violations above before moving forward.
+    │ Mypy is your friend.
+    └────────────────────────────────────────────┄┄
+"""
+FIXED_ERRORS = """
+    ┌────────────────────────────────────────────┄┄
+    │ {green}Your changes resolved existing violations.{end}
+    │ Great work! Please, run `{cmd} sync`
+    │ to remove resolved violations from the baseline file.
+    └────────────────────────────────────────────┄┄
+"""
+
 Command = Callable[[Config, TextIO, TextIO], int]
 
 
@@ -33,6 +52,28 @@ class Colors:
         if self.disabled:
             return str(text)
         return f'{BLUE}{text}{END}'
+
+    def get_exit_message(self, fixed: int, new: int) -> str:
+        if new:
+            msg = NEW_ERRORS
+        elif fixed:
+            msg = FIXED_ERRORS
+        else:
+            return ''
+        if self.disabled:
+            red = ''
+            green = ''
+            end = ''
+        else:
+            red = RED
+            green = GREEN
+            end = END
+        return msg.format(
+            red=red,
+            green=green,
+            end=end,
+            cmd=CMD,
+        )
 
 
 def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
@@ -71,7 +112,11 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
     new_count = len(new_errors)
     unresolved_count = len(unresolved_errors)
 
+    # calculate exit code
+    colors = Colors(disabled=config.no_colors)
     exit_code = new_count
+    msg = colors.get_exit_message(fixed=fixed_count, new=new_count)
+    print(msg, file=stdout)
     if not config.allow_unsynced:
         exit_code += fixed_count
     if exit_code > 100:
@@ -79,13 +124,14 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
     if config.hide_stats:
         return exit_code
 
-    colors = Colors(disabled=config.no_colors)
+    # print short summary
     print('total errors:', file=stdout)
     print(f'  fixed: {colors.green(fixed_count)}', file=stdout)
     print(f'  new: {colors.red(new_count)}', file=stdout)
     print(f'  unresolved: {colors.blue(unresolved_count)}', file=stdout)
     print(file=stdout)
 
+    # print stats for each error code (category)
     stats_total: defaultdict[str, int] = defaultdict(int)
     stats_fixed: defaultdict[str, int] = defaultdict(int)
     stats_new: defaultdict[str, int] = defaultdict(int)
@@ -141,8 +187,7 @@ COMMANDS: Mapping[str, Command] = {
 
 
 def main(argv: list[str], stdin: TextIO, stdout: TextIO) -> int:
-    exe = Path(sys.executable).name
-    parser = ArgumentParser(f'mypy --show-codes | {exe} -m mypy_baseline')
+    parser = ArgumentParser(CMD)
     parser.add_argument('cmd', choices=sorted(COMMANDS))
     Config.init_parser(parser)
     args = parser.parse_args(argv)
