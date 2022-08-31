@@ -9,13 +9,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._config import Config
 
-REX_LINE = re.compile(r"""
+COLOR_PATTERN = '(\x1b\\[\\d*m?|\x0f)*'
+REX_LINE = re.compile(rf"""
     (?P<path>.+\.py):
     (?P<lineno>[0-9]+):\s
-    (?P<severity>[a-z]+):\s
+    {COLOR_PATTERN}(?P<severity>[a-z]+):{COLOR_PATTERN}\s
     (?P<message>.+)\s\s
-    \[(?P<category>[a-z-]+)\]
-""", re.VERBOSE)
+    {COLOR_PATTERN}\[(?P<category>[a-z-]+)\]{COLOR_PATTERN}\s*
+""", re.VERBOSE | re.MULTILINE)
 
 
 @dataclass
@@ -50,7 +51,7 @@ class Error:
 
     @cached_property
     def category(self) -> str:
-        return self._match.group('category')
+        return self._match.group('category').strip()
 
     def get_clean_line(self, config: Config) -> str:
         path = Path(*self.path.parts[:config.depth])
