@@ -15,8 +15,9 @@ REX_LINE = re.compile(rf"""
     (?P<path>.+\.py):
     (?P<lineno>[0-9]+):\s
     {COLOR_PATTERN}(?P<severity>[a-z]+):{COLOR_PATTERN}\s
-    (?P<message>.+)\s\s
-    {COLOR_PATTERN}\[(?P<category>[a-z-]+)\]{COLOR_PATTERN}\s*
+    (?P<message>.+?)
+    (?:\s\s{COLOR_PATTERN}\[(?P<category>[a-z-]+)\]{COLOR_PATTERN})?
+    \s*
 """, re.VERBOSE | re.MULTILINE)
 
 
@@ -52,10 +53,13 @@ class Error:
 
     @cached_property
     def category(self) -> str:
-        return self._match.group('category').strip()
+        return self._match.group('category') or 'note'
 
     def get_clean_line(self, config: Config) -> str:
         path = Path(*self.path.parts[:config.depth])
         pos = self.line_number if config.preserve_position else 0
-        msg = REX_COLOR.sub('', self.message)
-        return f'{path}:{pos}: {self.severity}: {msg}  [{self.category}]'
+        msg = REX_COLOR.sub('', self.message).strip()
+        line = f'{path}:{pos}: {self.severity}: {msg}'
+        if self.category != 'note':
+            line += f'  [{self.category}]'
+        return line
