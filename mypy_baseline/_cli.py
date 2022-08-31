@@ -8,8 +8,8 @@ from typing import Any, Callable, Mapping, NoReturn, TextIO
 from ._config import Config
 from ._error import Error
 
-RED = '\033[1;31m'
-GREEN = '\033[1;32m'
+RED = '\033[31m'
+GREEN = '\033[32m'
 BLUE = '\033[94m'
 END = '\033[0m'
 Command = Callable[[Config, TextIO, TextIO], int]
@@ -42,7 +42,7 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
         baseline_text = ''
     baseline = baseline_text.splitlines()
 
-    fixed_errors: list[Error] = []
+    unresolved_errors: list[Error] = []
     new_errors: list[Error] = []
 
     for line in stdin:
@@ -57,15 +57,15 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
             print(line, end='', file=stdout)
             new_errors.append(error)
         else:
-            fixed_errors.append(error)
+            unresolved_errors.append(error)
 
-    unresolved_errors: list[Error] = []
+    fixed_errors: list[Error] = []
     for line in baseline:
         error = Error.new(line)
         if error is None:
             print(f'invalid baseline, cannot parse line: {line}')
             return 1
-        unresolved_errors.append(error)
+        fixed_errors.append(error)
 
     fixed_count = len(fixed_errors)
     new_count = len(new_errors)
@@ -95,8 +95,12 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
     for error in new_errors:
         stats_total[error.category] += 1
         stats_new[error.category] += 1
+    for error in unresolved_errors:
+        stats_total[error.category] += 1
+    print('errors by error code:', file=stdout)
     for category, total in sorted(stats_total.items()):
-        line = f'{category:24} {total: >3}'
+        total_formatted = f'{total: >3}'
+        line = f'  {category:24} {colors.blue(total_formatted)}'
         fixed = stats_fixed[category]
         if fixed:
             fixed_formatted = f'{-fixed: >3}'
@@ -123,9 +127,16 @@ def cmd_sync(config: Config, stdin: TextIO, stdout: TextIO) -> int:
     return 0
 
 
+def cmd_version(config: Config, stdin: TextIO, stdout: TextIO) -> int:
+    from mypy_baseline import __version__
+    print(__version__, file=stdout)
+    return 0
+
+
 COMMANDS: Mapping[str, Command] = {
     'filter': cmd_filter,
     'sync': cmd_sync,
+    'version': cmd_version,
 }
 
 

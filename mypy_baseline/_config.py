@@ -39,14 +39,35 @@ class Config:
     @classmethod
     def init_parser(self, parser: ArgumentParser) -> None:
         add = parser.add_argument
-        add('--config', type=Path, default=Path('pyproject.toml'))
-        add('--baseline-path', type=Path)
-        add('--depth', type=int)
+        add(
+            '--config', type=Path, default=Path('pyproject.toml'),
+            help='path to the configuration file.'
+        )
+        add(
+            '--baseline-path', type=Path,
+            help='path to the file where to store baseline.',
+        )
+        add(
+            '--depth', type=int,
+            help='cut paths longer than that many directories deep.'
+        )
 
-        add('--allow-unsynced', action='store_true')
-        add('--preserve-position', action='store_true')
-        add('--hide-stats', action='store_true')
-        add('--no-colors', action='store_true')
+        add(
+            '--allow-unsynced', action='store_true',
+            help='do not fail for resolved violations.'
+        )
+        add(
+            '--preserve-position', action='store_true',
+            help='do not remove line number from the baseline.',
+        )
+        add(
+            '--hide-stats', action='store_true',
+            help='do not show stats at the end.',
+        )
+        add(
+            '--no-colors', action='store_true',
+            help='disable colored output. Has no effect on the output of mypy.',
+        )
 
     def read_file(self, path: Path) -> Config:
         if not path.exists():
@@ -56,7 +77,7 @@ class Config:
         if tomli is not None:
             with path.open('rb') as stream:
                 data = tomli.load(stream)
-        elif toml is not None:   # type: ignore[unreachable]
+        elif toml is not None:
             with path.open('rb', encoding='utf8') as stream:
                 data = dict(toml.load(stream))
         else:
