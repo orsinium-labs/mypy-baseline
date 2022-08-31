@@ -1,7 +1,23 @@
 from __future__ import annotations
+from argparse import ArgumentParser
 
-from dataclasses import dataclass
+from dataclasses import dataclass, fields, replace
+import os
 from pathlib import Path
+from typing import Any
+
+try:
+    import toml
+except ImportError:
+    toml = None  # type: ignore[assignment]
+try:
+    import tomli
+except ImportError:
+    # https://peps.python.org/pep-0680/
+    try:
+        import tomllib as tomli  # type: ignore
+    except ImportError:
+        tomli = None   # type: ignore[assignment]
 
 
 @dataclass
@@ -11,4 +27,55 @@ class Config:
     allow_unsynced: bool = False
     preserve_position: bool = False
     hide_stats: bool = False
-    no_colors: bool = False
+    no_colors: bool = bool(os.environ.get('NO_COLOR'))
+
+    @classmethod
+    def from_args(cls, args: dict[str, Any]) -> Config:
+        config = cls()
+        config = config.read_file(args['config'])
+        config = config.read_args(args)
+        return config
+
+    @classmethod
+    def init_parser(self, parser: ArgumentParser) -> None:
+        add = parser.add_argument
+        add('--config', type=Path, default=Path('pyproject.toml'))
+        add('--baseline-path', type=Path)
+        add('--depth', type=int)
+
+        add('--allow-unsynced', action='store_true')
+        add('--preserve-position', action='store_true')
+        add('--hide-stats', action='store_true')
+        add('--no-colors', action='store_true')
+
+    def read_file(self, path: Path) -> Config:
+        if not path.exists():
+            return self
+
+        # parse the config file
+        if tomli is not None:
+            with path.open('rb') as stream:
+                data = tomli.load(stream)
+        elif toml is not None:   # type: ignore[unreachable]
+            with path.open('rb', encoding='utf8') as stream:
+                data = dict(toml.load(stream))
+        else:
+            return self
+
+        # extract the right section from the config
+        try:
+            data = data['tool']['mypy-baseline']
+        except KeyError:
+            try:
+                data = data['tool']['mypy_baseline']
+            except KeyError:
+                return self
+        return replace(self, **data)
+
+    def read_args(self, args: dict[str, Any]) -> Config:
+        config = replace(self)
+        for field in fields(self):
+            value = args[field.name]
+            if value is not None:
+                setattr(config, field.name, value)
+        return config
