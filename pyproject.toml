@@ -54,7 +54,7 @@ addopts = [
     "--cov=mypy_baseline",
     "--cov-report=html",
     "--cov-report=term-missing:skip-covered",
-    "--cov-fail-under=50",
+    "--cov-fail-under=30",
 ]
 
 [tool.coverage.report]
