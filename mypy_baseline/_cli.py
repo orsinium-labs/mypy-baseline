@@ -36,7 +36,10 @@ class Colors:
 
 
 def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
-    baseline_text = config.baseline_path.read_text(encoding='utf8')
+    try:
+        baseline_text = config.baseline_path.read_text(encoding='utf8')
+    except FileNotFoundError:
+        baseline_text = ''
     baseline = baseline_text.splitlines()
 
     fixed_errors: list[Error] = []
@@ -83,9 +86,9 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
     print(f'  unresolved: {colors.blue(unresolved_count)}', file=stdout)
     print(file=stdout)
 
-    stats_total: defaultdict[str, int] = defaultdict()
-    stats_fixed: defaultdict[str, int] = defaultdict()
-    stats_new: defaultdict[str, int] = defaultdict()
+    stats_total: defaultdict[str, int] = defaultdict(int)
+    stats_fixed: defaultdict[str, int] = defaultdict(int)
+    stats_new: defaultdict[str, int] = defaultdict(int)
     for error in fixed_errors:
         stats_total[error.category] += 1
         stats_fixed[error.category] += 1
@@ -93,22 +96,36 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
         stats_total[error.category] += 1
         stats_new[error.category] += 1
     for category, total in sorted(stats_total.items()):
-        line = f'{category:10} {total: >3}'
+        line = f'{category:24} {total: >3}'
         fixed = stats_fixed[category]
         if fixed:
-            fixed_formatted = f'{-fixed:}'
+            fixed_formatted = f'{-fixed: >3}'
             line += f' {colors.green(fixed_formatted)}'
         new = stats_new[category]
         if new:
-            new_formatted = f'{new:+}'
+            new_formatted = f'{new: >+3}'
             line += f' {colors.red(new_formatted)}'
         print(line, file=stdout)
 
     return exit_code
 
 
+def cmd_sync(config: Config, stdin: TextIO, stdout: TextIO) -> int:
+    baseline: list[str] = []
+    for line in stdin:
+        error = Error.new(line)
+        if error is None:
+            print(line, end='', file=stdout)
+            continue
+        clean_line = error.get_clean_line(config)
+        baseline.append(clean_line)
+    config.baseline_path.write_text('\n'.join(baseline), encoding='utf8')
+    return 0
+
+
 COMMANDS: Mapping[str, Command] = {
     'filter': cmd_filter,
+    'sync': cmd_sync,
 }
 
 
@@ -117,9 +134,9 @@ def main(argv: list[str], stdin: TextIO, stdout: TextIO) -> int:
     parser = ArgumentParser(f'mypy --show-codes | {exe} -m mypy_baseline')
     parser.add_argument('cmd', default='filter', choices=sorted(COMMANDS))
     Config.init_parser(parser)
-    args: dict[str, Any] = parser.parse_args(argv, dict())
-    cmd = COMMANDS[args['cmd']]
-    config = Config.from_args(args)
+    args = parser.parse_args(argv)
+    cmd = COMMANDS[args.cmd]
+    config = Config.from_args(vars(args))
     return cmd(config, stdin, stdout)
 
 
