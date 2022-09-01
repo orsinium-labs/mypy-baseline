@@ -34,6 +34,8 @@ class Config:
         config = cls()
         config = config.read_file(args['config'])
         config = config.read_args(args)
+        if isinstance(config.baseline_path, str):
+            config.baseline_path = Path(config.baseline_path)
         return config
 
     @classmethod
