@@ -2,6 +2,7 @@ from __future__ import annotations
 from argparse import ArgumentParser
 from collections import defaultdict
 from dataclasses import dataclass
+from itertools import chain
 import sys
 from typing import Any, Callable, Mapping, NoReturn, TextIO
 from ._config import Config
@@ -11,7 +12,7 @@ RED = '\033[31m'
 GREEN = '\033[32m'
 BLUE = '\033[94m'
 END = '\033[0m'
-CMD = 'mypy --show-codes | mypy_baseline'
+CMD = 'mypy --show-codes | mypy-baseline'
 
 NEW_ERRORS = """
     ┌────────────────────────────────────────────┄┄
@@ -112,8 +113,6 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
     # calculate exit code
     colors = Colors(disabled=config.no_colors)
     exit_code = new_count
-    msg = colors.get_exit_message(fixed=fixed_count, new=new_count)
-    print(msg, file=stdout)
     if not config.allow_unsynced:
         exit_code += fixed_count
     if exit_code > 100:
@@ -122,6 +121,7 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
         return exit_code
 
     # print short summary
+    print(file=stdout)
     print('total errors:', file=stdout)
     print(f'  fixed: {colors.green(fixed_count)}', file=stdout)
     print(f'  new: {colors.red(new_count)}', file=stdout)
@@ -158,7 +158,27 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
             new_formatted = f'{new: >+3}'
             line += f' {colors.red(new_formatted)}'
         print(line, file=stdout)
+    print(file=stdout)
 
+    # print stats for each file (category)
+    print('top files with errors:', file=stdout)
+    file_stats: dict[str, int] = defaultdict(int)
+    for error in chain(fixed_errors, new_errors, unresolved_errors):
+        path = '/'.join(error.path.parts[:config.depth])
+        file_stats[path] += 1
+    sorted_file_stats = sorted(
+        file_stats.items(),
+        key=lambda x: x[::-1],
+        reverse=True,
+    )
+    max_width = max(len(path) for path, _ in sorted_file_stats[:5])
+    for path, total_count in sorted_file_stats[:5]:
+        total_formatted = f'{total_count:>3}'
+        path = path.ljust(max_width)
+        print(f'  {path} {colors.blue(total_formatted)}', file=stdout)
+
+    msg = colors.get_exit_message(fixed=fixed_count, new=new_count)
+    print(msg, file=stdout)
     return exit_code
 
 
