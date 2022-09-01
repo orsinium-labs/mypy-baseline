@@ -9,7 +9,7 @@ authors = [
 ]
 license = {file = "LICENSE"}
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dynamic = ["version", "description"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -31,6 +31,9 @@ test = ["pytest", "pytest-cov"]
 
 [project.urls]
 Source = "https://github.com/orsinium-labs/mypy-baseline"
+
+[project.scripts]
+mypy-baseline = "mypy_baseline:entrypoint"
 
 [tool.mypy]
 files = ["mypy_baseline"]
@@ -54,7 +57,7 @@ addopts = [
     "--cov=mypy_baseline",
     "--cov-report=html",
     "--cov-report=term-missing:skip-covered",
-    "--cov-fail-under=30",
+    "--cov-fail-under=80",
 ]
 
 [tool.coverage.report]
