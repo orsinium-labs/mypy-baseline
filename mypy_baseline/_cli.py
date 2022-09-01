@@ -2,7 +2,6 @@ from __future__ import annotations
 from argparse import ArgumentParser
 from collections import defaultdict
 from dataclasses import dataclass
-from pathlib import Path
 import sys
 from typing import Any, Callable, Mapping, NoReturn, TextIO
 from ._config import Config
@@ -12,9 +11,7 @@ RED = '\033[31m'
 GREEN = '\033[32m'
 BLUE = '\033[94m'
 END = '\033[0m'
-
-EXE = Path(sys.executable).name
-CMD = f'mypy --show-codes | {EXE} -m mypy_baseline'
+CMD = 'mypy --show-codes | mypy_baseline'
 
 NEW_ERRORS = """
     ┌────────────────────────────────────────────┄┄
@@ -144,7 +141,12 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
     for error in unresolved_errors:
         stats_total[error.category] += 1
     print('errors by error code:', file=stdout)
-    for category, total in sorted(stats_total.items()):
+    sorted_stats = sorted(
+        stats_total.items(),
+        key=lambda x: x[::-1],
+        reverse=True,
+    )
+    for category, total in sorted_stats:
         total_formatted = f'{total: >3}'
         line = f'  {category:24} {colors.blue(total_formatted)}'
         fixed = stats_fixed[category]
