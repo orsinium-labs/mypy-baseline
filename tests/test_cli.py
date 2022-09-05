@@ -47,3 +47,13 @@ def test_filter():
     assert '  unresolved' in actual
     assert 'Your changes introduced' in actual
     assert 'top files with errors' in actual
+
+
+def test_filter__empty_stdin():
+    stdin = StringIO()
+    stdout = StringIO()
+    code = main(['filter'], stdin, stdout)
+    assert code == 0
+    stdout.seek(0)
+    actual = stdout.read()
+    assert actual == ''

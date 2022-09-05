@@ -107,7 +107,8 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
     unresolved_count = len(unresolved_errors)
 
     # calculate exit code
-    colors = Colors(disabled=config.no_colors)
+    if not fixed_count and not new_count and not unresolved_count:
+        return 0
     exit_code = new_count
     if not config.allow_unsynced:
         exit_code += fixed_count
@@ -117,6 +118,7 @@ def cmd_filter(config: Config, stdin: TextIO, stdout: TextIO) -> int:
         return exit_code
 
     # print short summary
+    colors = Colors(disabled=config.no_colors)
     print(file=stdout)
     print('total errors:', file=stdout)
     print(f'  fixed: {colors.green(fixed_count)}', file=stdout)
