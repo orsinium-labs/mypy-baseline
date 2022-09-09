@@ -21,7 +21,7 @@ NEW_ERRORS = """
 FIXED_ERRORS = """
     ┌────────────────────────────────────────────┄┄
     │ {green}Your changes resolved existing violations.{end}
-    │ Great work! Please, run `mypy --show-codes | mypy-baseline sync`
+    │ Great work! Please, run `mypy --show-error-codes | mypy-baseline sync`
     │ to remove resolved violations from the baseline file.
     └────────────────────────────────────────────┄┄
 """

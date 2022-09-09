@@ -28,13 +28,13 @@ python3 -m pip install mypy-baseline
 First of all, you need to create the baseline (will be stored in `mypy-baseline.txt` by default):
 
 ```bash
-mypy --show-codes | mypy-baseline sync
+mypy --show-error-codes | mypy-baseline sync
 ```
 
 After that, you can pipe mypy output into `mypy-baseline filter`, and it will filter out all issues that are already in the baseline:
 
 ```bash
-mypy --show-codes | mypy-baseline filter
+mypy --show-error-codes | mypy-baseline filter
 ```
 
 If you introduce new errors, resolve them. If you resolve existing errors, run `mypy-baseline sync` again to re-generate baseline. In both cases, mypy-baseline will tell you what's wrong and what to do. Enjoy the ride!
