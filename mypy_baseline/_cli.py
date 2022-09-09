@@ -36,7 +36,7 @@ COMMANDS: Mapping[str, Command] = {
 
 
 def main(argv: list[str], stdin: TextIO, stdout: TextIO) -> int:
-    parser = ArgumentParser('mypy --show-error-codes | mypy-baseline')
+    parser = ArgumentParser('mypy | mypy-baseline')
     parser.add_argument('cmd', choices=sorted(COMMANDS))
     Config.init_parser(parser)
     args = parser.parse_args(argv)
