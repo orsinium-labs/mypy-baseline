@@ -17,5 +17,6 @@ class Sync(Command):
                 continue
             clean_line = error.get_clean_line(self.config)
             baseline.append(clean_line)
-        self.config.baseline_path.write_text('\n'.join(baseline), encoding='utf8')
+        serialized = '\n'.join(baseline) + '\n'
+        self.config.baseline_path.write_text(serialized, encoding='utf8')
         return 0
