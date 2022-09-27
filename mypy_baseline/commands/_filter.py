@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import defaultdict
 from itertools import chain
 
-from .._colors import Colors
 from .._error import Error
 from ._base import Command
 
@@ -60,12 +59,11 @@ class Filter(Command):
             return exit_code
 
         # print short summary
-        colors = Colors(disabled=self.config.no_colors)
         self.print()
         self.print('total errors:')
-        self.print(f'  fixed: {colors.green(fixed_count)}')
-        self.print(f'  new: {colors.red(new_count)}')
-        self.print(f'  unresolved: {colors.blue(unresolved_count)}')
+        self.print(f'  fixed: {self.colors.green(fixed_count)}')
+        self.print(f'  new: {self.colors.red(new_count)}')
+        self.print(f'  unresolved: {self.colors.blue(unresolved_count)}')
         self.print()
 
         # print stats for each error code (category)
@@ -88,15 +86,15 @@ class Filter(Command):
         )
         for category, total in sorted_stats:
             total_formatted = f'{total: >3}'
-            line = f'  {category:24} {colors.blue(total_formatted)}'
+            line = f'  {category:24} {self.colors.blue(total_formatted)}'
             fixed = stats_fixed[category]
             if fixed:
                 fixed_formatted = f'{-fixed: >3}'
-                line += f' {colors.green(fixed_formatted)}'
+                line += f' {self.colors.green(fixed_formatted)}'
             new = stats_new[category]
             if new:
                 new_formatted = f'{new: >+3}'
-                line += f' {colors.red(new_formatted)}'
+                line += f' {self.colors.red(new_formatted)}'
             self.print(line)
         self.print()
 
@@ -115,8 +113,8 @@ class Filter(Command):
         for path, total_count in sorted_file_stats[:5]:
             total_formatted = f'{total_count:>3}'
             path = path.ljust(max_width)
-            self.print(f'  {path} {colors.blue(total_formatted)}')
+            self.print(f'  {path} {self.colors.blue(total_formatted)}')
 
-        msg = colors.get_exit_message(fixed=fixed_count, new=new_count)
+        msg = self.colors.get_exit_message(fixed=fixed_count, new=new_count)
         self.print(msg)
         return exit_code

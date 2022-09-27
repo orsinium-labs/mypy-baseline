@@ -6,6 +6,7 @@ from functools import cached_property
 from typing import ClassVar, TextIO
 
 from .._config import Config
+from .._colors import Colors
 
 
 @dataclass
@@ -28,3 +29,7 @@ class Command:
     @cached_property
     def config(self) -> Config:
         return Config.from_args(vars(self.args))
+
+    @cached_property
+    def colors(self) -> Colors:
+        return Colors(disabled=self.config.no_colors)
