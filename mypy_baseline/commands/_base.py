@@ -15,7 +15,7 @@ class Command:
 
     @staticmethod
     def init_parser(parser: ArgumentParser) -> None:
-        pass
+        Config.init_parser(parser)
 
     def run(self) -> int:
         raise NotImplementedError

@@ -12,8 +12,8 @@ def main(argv: list[str], stdin: TextIO, stdout: TextIO) -> int:
     parser.set_defaults(cmd=None)
 
     cmd_class: type[Command]
-    for name, cmd_class in commands.items():
-        subparser = subparsers.add_parser(name=name)
+    for name, cmd_class in sorted(commands.items()):
+        subparser = subparsers.add_parser(name=name, help=cmd_class.__doc__)
         subparser.set_defaults(cmd=cmd_class)
         cmd_class.init_parser(subparser)
     args = parser.parse_args(argv)

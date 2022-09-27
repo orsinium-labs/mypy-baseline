@@ -4,6 +4,9 @@ from .._error import Error
 
 
 class Sync(Command):
+    """Generate baseline with all existing errors.
+    """
+
     def run(self) -> int:
         baseline: list[str] = []
         for line in self.stdin:

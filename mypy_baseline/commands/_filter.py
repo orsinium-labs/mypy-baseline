@@ -7,6 +7,9 @@ from .._error import Error
 
 
 class Filter(Command):
+    """Filter out old mypy errors from stdin.
+    """
+
     def run(self) -> int:
         try:
             baseline_text = self.config.baseline_path.read_text(encoding='utf8')
