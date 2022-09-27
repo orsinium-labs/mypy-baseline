@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
-import re
 from typing import TYPE_CHECKING
+
 
 if TYPE_CHECKING:
     from ._config import Config

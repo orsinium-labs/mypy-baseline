@@ -1,6 +1,7 @@
 from __future__ import annotations
-from ._base import Command
+
 from .._error import Error
+from ._base import Command
 
 
 class Sync(Command):

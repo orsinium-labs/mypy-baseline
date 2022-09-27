@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
 from functools import cached_property
 from typing import ClassVar, TextIO
+
 from .._config import Config
 
 

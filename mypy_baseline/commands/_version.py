@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from argparse import ArgumentParser
+
 from ._base import Command
 
 

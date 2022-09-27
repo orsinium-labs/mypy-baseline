@@ -1,6 +1,7 @@
-from pathlib import Path
-from mypy_baseline import main
 from io import StringIO
+from pathlib import Path
+
+from mypy_baseline import main
 
 
 def test_version():

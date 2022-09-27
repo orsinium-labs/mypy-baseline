@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 import sys
 from argparse import ArgumentParser
 from typing import NoReturn, TextIO
 
-from .commands import commands, Command
+from .commands import Command, commands
 
 
 def main(argv: list[str], stdin: TextIO, stdout: TextIO) -> int:

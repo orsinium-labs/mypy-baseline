@@ -1,9 +1,11 @@
 from __future__ import annotations
-from ._base import Command
+
 from collections import defaultdict
 from itertools import chain
+
 from .._colors import Colors
 from .._error import Error
+from ._base import Command
 
 
 class Filter(Command):
