@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from ._base import Command
 from .._git import get_commits
+from ._base import Command
 
 
 class History(Command):

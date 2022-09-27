@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from argparse import ArgumentParser
 from pathlib import Path
 
-from ._base import Command
 from .._git import get_commits
+from ._base import Command
 
 
 class Plot(Command):

@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import ClassVar, TextIO
 
-from .._config import Config
 from .._colors import Colors
+from .._config import Config
 
 
 @dataclass

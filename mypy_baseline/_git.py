@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import re
+import subprocess
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from functools import cached_property
 from pathlib import Path
-import re
-import subprocess
 from typing import Iterator
+
 
 REX_COMMIT = re.compile(
     (
