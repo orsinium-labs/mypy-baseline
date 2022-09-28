@@ -4,7 +4,7 @@ A CLI tool for painless integration of mypy with an existing Python project. Whe
 
 Additionally, the tool will show you what progress you made since the last baseline, to encourage your team to resolve mypy errors:
 
-![example of the command output](./example.png)
+![example of the command output](./assets/example.png)
 
 Features:
 
@@ -65,6 +65,15 @@ hide_stats = False
 # --no-colors: do not use colors in stats
 no_colors = False
 ```
+
+## History
+
+There are 2 commands to show how the baseline has changed over time:
+
+1. `mypy-baseline history` prints in terminal commits that modified the baseline file and how many lines it had.
+1. `mypy-baseline plot` will draw a chart of the baseline size change over time using [plotnine](https://github.com/has2k1/plotnine).
+
+![example of the command output](./assets/history.png)
 
 ## How to
 
