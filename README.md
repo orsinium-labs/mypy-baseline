@@ -97,7 +97,7 @@ There are 2 commands to show how the baseline has changed over time:
     1. The last resort is to add `# type: ignore[error-code]` to the line that caused the issue. Don't overuse it, though, each error reported by mypy is reported for a reason.
 1. **Resolve old errors**.
     1. Run bare-bones mypy without using mypy-baseline, and that will spit out all existing type errors.
-    1. One of the stats mypy-baseline shows is "top files with errors". These are the files that need the most attention. Either they have lots of problems, or there is a small error (like a wrong annotation for a base class method) that causes a cascade of type violations and so fixing it would be a quick win.
+    1. Run `mypy-baseline top-files`. These are the files that need the most attention. Either they have lots of problems, or there is a small error (like a wrong annotation for a base class method) that causes a cascade of type violations and so fixing it would be a quick win.
     1. Don't forget to run `mypy | mypy-baseline sync` when you finish.
 1. **Keep mypy-baseline in sync**.
     1. By default, mypy-baseline will fail if there are resolved but unsynced errors. The reason for that is to keep `mypy-baseline.txt` always up-to-date. If you don't do that, it will be hard for others to see what errors their changes resolved. Think about others.
@@ -114,3 +114,16 @@ There are 2 commands to show how the baseline has changed over time:
     1. When you're happy with the config, it's time to integrate mypy-plugins and stubs you haven't integrated yet. See [awesome-python-typing](https://github.com/typeddjango/awesome-python-typing) for what is available.
 
 And whatever happens, be brave. Tinker, experiment, hack, and observe.
+
+## All commands
+
+This is the list of all subcommands mypy-baseline provides:
+
+```plain
+filter              Filter out old mypy errors from stdin.
+history             Show how the baseline changed over time.
+plot                Draw the graph of how the baseline changed over time.
+sync                Generate baseline with all existing errors.
+top-files           Show files with the most errors.
+version             Print the version of mypy-baseline.
+```

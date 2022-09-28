@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from itertools import chain
 
 from .._error import Error
 from ._base import Command
@@ -97,23 +96,6 @@ class Filter(Command):
                 line += f' {self.colors.red(new_formatted)}'
             self.print(line)
         self.print()
-
-        # print stats for each file (category)
-        self.print('top files with errors:')
-        file_stats: dict[str, int] = defaultdict(int)
-        for error in chain(fixed_errors, new_errors, unresolved_errors):
-            path = '/'.join(error.path.parts[:self.config.depth])
-            file_stats[path] += 1
-        sorted_file_stats = sorted(
-            file_stats.items(),
-            key=lambda x: x[::-1],
-            reverse=True,
-        )
-        max_width = max(len(path) for path, _ in sorted_file_stats[:5])
-        for path, total_count in sorted_file_stats[:5]:
-            total_formatted = f'{total_count:>3}'
-            path = path.ljust(max_width)
-            self.print(f'  {path} {self.colors.blue(total_formatted)}')
 
         msg = self.colors.get_exit_message(fixed=fixed_count, new=new_count)
         self.print(msg)

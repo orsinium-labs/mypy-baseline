@@ -8,7 +8,7 @@ from .commands import Command, commands
 
 
 def main(argv: list[str], stdin: TextIO, stdout: TextIO) -> int:
-    parser = ArgumentParser('mypy | mypy-baseline')
+    parser = ArgumentParser('mypy-baseline')
     subparsers = parser.add_subparsers()
     parser.set_defaults(cmd=None)
 

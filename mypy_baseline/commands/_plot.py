@@ -10,7 +10,7 @@ from ._base import Command
 class Plot(Command):
     """Draw the graph of how the baseline changed over time.
 
-    Requires pandas and plotnine to be installed.
+    Requires plotnine to be installed.
     """
     @classmethod
     def init_parser(cls, parser: ArgumentParser) -> None:

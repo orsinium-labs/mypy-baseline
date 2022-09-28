@@ -47,7 +47,6 @@ def test_filter():
     assert '  union-attr  ' in actual
     assert '  unresolved' in actual
     assert 'Your changes introduced' in actual
-    assert 'top files with errors' in actual
 
 
 def test_filter__empty_stdin():
