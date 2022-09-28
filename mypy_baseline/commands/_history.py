@@ -10,7 +10,8 @@ class History(Command):
 
     def run(self) -> int:
         for commit in get_commits(self.config.baseline_path):
-            line = f'{commit.created_at} {self.colors.blue(commit.lines_count)}'
+            count_formatted = f'{commit.lines_count:>3}'
+            line = f'{commit.created_at} {self.colors.blue(count_formatted)}'
             if commit.deletions:
                 formatted = f'{-commit.deletions: >+4}'
                 line += f' {self.colors.green(formatted)}'

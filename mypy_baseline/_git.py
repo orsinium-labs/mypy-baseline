@@ -32,7 +32,8 @@ class Commit:
 
     @cached_property
     def lines_count(self) -> int:
-        cmd = ['git', 'show', f'{self.hash}:{self.path}']
+        path = self.path.relative_to(Path().absolute())
+        cmd = ['git', 'show', f'{self.hash}:{path}']
         result = subprocess.run(cmd, stdout=subprocess.PIPE)
         result.check_returncode()
         lines = result.stdout.decode().strip().splitlines()

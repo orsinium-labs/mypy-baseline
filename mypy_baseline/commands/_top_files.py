@@ -21,7 +21,8 @@ class TopFiles(Command):
     def run(self) -> int:
         baseline_text = self.config.baseline_path.read_text(encoding='utf8')
         file_stats: dict[str, int] = defaultdict(int)
-        for line in baseline_text.splitlines():
+        baseline = baseline_text.strip().splitlines()
+        for line in baseline:
             error = Error.new(line)
             if error is None:
                 self.print(f'cannot parse line: {line}')
@@ -38,6 +39,7 @@ class TopFiles(Command):
         for path, total_count in sorted_file_stats[:self.args.n]:
             total_formatted = f'{total_count:>3}'
             path = path.ljust(max_width)
-            self.print(f'{path} {self.colors.blue(total_formatted)}')
+            percent = round(total_count / len(baseline) * 100, 1)
+            self.print(f'{path} {self.colors.blue(total_formatted)} {percent:>4}%')
 
         return 0
