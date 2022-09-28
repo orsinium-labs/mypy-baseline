@@ -1,6 +1,7 @@
-from pathlib import Path
-from mypy_baseline import main
 from io import StringIO
+from pathlib import Path
+
+from mypy_baseline import main
 
 
 def test_version():
@@ -46,7 +47,6 @@ def test_filter():
     assert '  union-attr  ' in actual
     assert '  unresolved' in actual
     assert 'Your changes introduced' in actual
-    assert 'top files with errors' in actual
 
 
 def test_filter__empty_stdin():
@@ -57,3 +57,27 @@ def test_filter__empty_stdin():
     stdout.seek(0)
     actual = stdout.read()
     assert actual == ''
+
+
+def test_top_files(tmp_path: Path):
+    blpath = tmp_path / 'bline.txt'
+    blpath.write_text(f'{LINE1}{LINE2}')
+    cmd = ['top-files', '--baseline-path', str(blpath), '--no-color']
+    stdout = StringIO()
+    code = main(cmd, StringIO(), stdout)
+    assert code == 0
+    stdout.seek(0)
+    actual = stdout.read()
+    assert 'views.py' in actual
+    assert 'settings.py' in actual
+
+
+def test_history():
+    readme_path = Path(__file__).parent.parent / 'README.md'
+    cmd = ['history', '--baseline-path', str(readme_path), '--no-color']
+    stdout = StringIO()
+    code = main(cmd, StringIO(), stdout)
+    assert code == 0
+    stdout.seek(0)
+    actual = stdout.read()
+    assert '2022-09-09 08:34:06+02:00  67   -3  +10' in actual

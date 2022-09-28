@@ -1,49 +1,31 @@
 from __future__ import annotations
-from argparse import ArgumentParser
+
 import sys
-from typing import Callable, Mapping, NoReturn, TextIO
-from ._config import Config
-from ._error import Error
-from ._cmd_filter import cmd_filter
+from argparse import ArgumentParser
+from typing import NoReturn, TextIO
 
-Command = Callable[[Config, TextIO, TextIO], int]
-
-
-def cmd_sync(config: Config, stdin: TextIO, stdout: TextIO) -> int:
-    baseline: list[str] = []
-    for line in stdin:
-        error = Error.new(line)
-        if error is None:
-            print(line, end='', file=stdout)
-            continue
-        clean_line = error.get_clean_line(config)
-        baseline.append(clean_line)
-    config.baseline_path.write_text('\n'.join(baseline), encoding='utf8')
-    return 0
-
-
-def cmd_version(config: Config, stdin: TextIO, stdout: TextIO) -> int:
-    from mypy_baseline import __version__
-    print(__version__, file=stdout)
-    return 0
-
-
-COMMANDS: Mapping[str, Command] = {
-    'filter': cmd_filter,
-    'sync': cmd_sync,
-    'version': cmd_version,
-}
+from .commands import Command, commands
 
 
 def main(argv: list[str], stdin: TextIO, stdout: TextIO) -> int:
-    parser = ArgumentParser('mypy | mypy-baseline')
-    parser.add_argument('cmd', choices=sorted(COMMANDS))
-    Config.init_parser(parser)
+    parser = ArgumentParser('mypy-baseline')
+    subparsers = parser.add_subparsers()
+    parser.set_defaults(cmd=None)
+
+    cmd_class: type[Command]
+    for name, cmd_class in sorted(commands.items()):
+        subparser = subparsers.add_parser(name=name, help=cmd_class.__doc__)
+        subparser.set_defaults(cmd=cmd_class)
+        cmd_class.init_parser(subparser)
     args = parser.parse_args(argv)
-    cmd = COMMANDS[args.cmd]
-    config = Config.from_args(vars(args))
-    return cmd(config, stdin, stdout)
+
+    cmd_class = args.cmd
+    if cmd_class is None:
+        parser.print_help()
+        return 1
+    cmd = cmd_class(args=args, stdin=stdin, stdout=stdout)
+    return cmd.run()
 
 
 def entrypoint() -> NoReturn:
-    sys.exit(main(sys.argv[1:], sys.stdin, sys.stdout))
+    sys.exit(main(argv=sys.argv[1:], stdin=sys.stdin, stdout=sys.stdout))
