@@ -32,12 +32,24 @@ class Commit:
 
     @cached_property
     def lines_count(self) -> int:
-        path = self.path.relative_to(Path().absolute())
+        path = self.path
+        if path.is_absolute():
+            path = path.relative_to(Path().absolute())
         cmd = ['git', 'show', f'{self.hash}:{path}']
         result = subprocess.run(cmd, stdout=subprocess.PIPE)
         result.check_returncode()
         lines = result.stdout.decode().strip().splitlines()
         return len(lines)
+
+    def fix_lines_count(self, prev_count: int | None) -> None:
+        """
+        We want to show not the actual lines count that the commit resulted in
+        but how its changed affected the previous count.
+        These numbers can be different if there are 2 commits with the same
+        parent commit that changed the baseline.
+        """
+        if prev_count is not None:
+            self.lines_count = prev_count + self.insertions - self.deletions
 
     def as_dict(self) -> dict[str, object]:
         result = asdict(self)
@@ -46,7 +58,7 @@ class Commit:
 
 
 def get_commits(path: Path) -> Iterator[Commit]:
-    cmd = ['git', 'log', '--format=%H %cI', '--stat', '--', str(path)]
+    cmd = ['git', 'log', '--format=%H %cI', '--reverse', '--stat', '--', str(path)]
     result = subprocess.run(cmd, stdout=subprocess.PIPE)
     result.check_returncode()
     stdout = result.stdout.decode()

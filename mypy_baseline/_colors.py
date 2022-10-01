@@ -7,6 +7,7 @@ from typing import Any
 RED = '\033[31m'
 GREEN = '\033[32m'
 BLUE = '\033[94m'
+GRAY = '\033[37m'
 END = '\033[0m'
 
 NEW_ERRORS = """
@@ -43,6 +44,11 @@ class Colors:
         if self.disabled:
             return str(text)
         return f'{BLUE}{text}{END}'
+
+    def gray(self, text: Any) -> str:
+        if self.disabled:
+            return str(text)
+        return f'{GRAY}{text}{END}'
 
     def get_exit_message(self, fixed: int, new: int) -> str:
         if new:

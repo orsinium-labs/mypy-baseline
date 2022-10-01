@@ -24,14 +24,21 @@ class Plot(Command):
         import pandas
         import plotnine as gg
         commits = list(get_commits(self.config.baseline_path))
-        commits = commits[:-1]  # drop the oldest commit
+
+        prev_count: int | None = None
+        for commit in commits:
+            commit.fix_lines_count(prev_count)
+            prev_count = commit.lines_count
+
+        commits = commits[1:]  # drop the oldest commit
         df = pandas.DataFrame(c.as_dict() for c in commits)
         df['created_at'] = pandas.to_datetime(df.created_at, utc=True)
         graph = (
             gg.ggplot(df, gg.aes(x='created_at', y='lines_count'))
             + gg.geom_line()
-            + gg.geom_point(gg.aes(color='deletions >= insertions'))
+            + gg.geom_point(gg.aes(color='deletions > insertions'))
             + gg.ylim(0, max(c.lines_count for c in commits) + 5)
+            + gg.theme(axis_text_x=gg.element_text(rotation=45, hjust=1))
             + gg.xlab('commit time')
             + gg.ylab('unresolved issues')
         )
