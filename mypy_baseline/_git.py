@@ -32,7 +32,9 @@ class Commit:
 
     @cached_property
     def lines_count(self) -> int:
-        path = self.path.relative_to(Path().absolute())
+        path = self.path
+        if path.is_absolute():
+            path = path.relative_to(Path().absolute())
         cmd = ['git', 'show', f'{self.hash}:{path}']
         result = subprocess.run(cmd, stdout=subprocess.PIPE)
         result.check_returncode()
@@ -46,7 +48,7 @@ class Commit:
 
 
 def get_commits(path: Path) -> Iterator[Commit]:
-    cmd = ['git', 'log', '--format=%H %cI', '--stat', '--', str(path)]
+    cmd = ['git', 'log', '--format=%H %cI', '--reverse', '--stat', '--', str(path)]
     result = subprocess.run(cmd, stdout=subprocess.PIPE)
     result.check_returncode()
     stdout = result.stdout.decode()
