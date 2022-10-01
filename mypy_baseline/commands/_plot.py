@@ -36,8 +36,9 @@ class Plot(Command):
         graph = (
             gg.ggplot(df, gg.aes(x='created_at', y='lines_count'))
             + gg.geom_line()
-            + gg.geom_point(gg.aes(color='deletions >= insertions'))
+            + gg.geom_point(gg.aes(color='deletions > insertions'))
             + gg.ylim(0, max(c.lines_count for c in commits) + 5)
+            + gg.theme(axis_text_x=gg.element_text(rotation=45, hjust=1))
             + gg.xlab('commit time')
             + gg.ylab('unresolved issues')
         )
