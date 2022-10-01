@@ -41,6 +41,16 @@ class Commit:
         lines = result.stdout.decode().strip().splitlines()
         return len(lines)
 
+    def fix_lines_count(self, prev_count: int | None) -> None:
+        """
+        We want to show not the actual lines count that the commit resulted in
+        but how its changed affected the previous count.
+        These numbers can be different if there are 2 commits with the same
+        parent commit that changed the baseline.
+        """
+        if prev_count is not None:
+            self.lines_count = prev_count + self.insertions - self.deletions
+
     def as_dict(self) -> dict[str, object]:
         result = asdict(self)
         result['lines_count'] = self.lines_count

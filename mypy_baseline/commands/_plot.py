@@ -24,7 +24,13 @@ class Plot(Command):
         import pandas
         import plotnine as gg
         commits = list(get_commits(self.config.baseline_path))
-        commits = commits[:-1]  # drop the oldest commit
+
+        prev_count: int | None = None
+        for commit in commits:
+            commit.fix_lines_count(prev_count)
+            prev_count = commit.lines_count
+
+        commits = commits[1:]  # drop the oldest commit
         df = pandas.DataFrame(c.as_dict() for c in commits)
         df['created_at'] = pandas.to_datetime(df.created_at, utc=True)
         graph = (
