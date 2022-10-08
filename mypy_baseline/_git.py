@@ -13,6 +13,7 @@ REX_COMMIT = re.compile(
     (
         r'(?P<hash>[0-9a-f]{40}) '
         r'(?P<created_at>[0-9T:+-]+)\s+'
+        r'(?P<author_email>[^\s]+)\s+'
         r'.+ \| \d+ [+-]+\s+'
         r'\d+ files? changed'
         r'(?:, (?P<insertions>\d+) insertions?\(\+\))?'
@@ -26,6 +27,7 @@ REX_COMMIT = re.compile(
 class Commit:
     path: Path
     hash: str
+    author_email: str
     created_at: datetime
     insertions: int
     deletions: int
@@ -58,7 +60,7 @@ class Commit:
 
 
 def get_commits(path: Path) -> Iterator[Commit]:
-    cmd = ['git', 'log', '--format=%H %cI', '--reverse', '--stat', '--', str(path)]
+    cmd = ['git', 'log', '--format=%H %cI %ae', '--reverse', '--stat', '--', str(path)]
     result = subprocess.run(cmd, stdout=subprocess.PIPE)
     result.check_returncode()
     stdout = result.stdout.decode()
@@ -67,6 +69,7 @@ def get_commits(path: Path) -> Iterator[Commit]:
         yield Commit(
             path=path,
             hash=info['hash'],
+            author_email=info['author_email'],
             created_at=datetime.fromisoformat(info['created_at']),
             insertions=int(info['insertions'] or '0'),
             deletions=int(info['deletions'] or '0'),

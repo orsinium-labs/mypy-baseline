@@ -80,4 +80,5 @@ def test_history():
     assert code == 0
     stdout.seek(0)
     actual = stdout.read()
-    assert '2022-09-09 08:34:06+02:00  67   -3  +10' in actual
+    exp = '2022-09-01 11:45:28+02:00  60 =   3   -1  +58   8fe7afd10c  git@orsinium.dev'
+    assert exp in actual
