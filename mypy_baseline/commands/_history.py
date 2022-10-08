@@ -10,7 +10,7 @@ class History(Command):
 
     def run(self) -> int:
         prev_count: int | None = None
-        self.print('date       time           res   old  fix  new   commit')
+        self.print('date       time           res   old  fix  new   commit      author')
         for commit in get_commits(self.config.baseline_path):
             commit.fix_lines_count(prev_count)
             count_formatted = f'{commit.lines_count:>3}'
@@ -26,7 +26,8 @@ class History(Command):
                 line += f' {self.colors.red(formatted)}'
             else:
                 line += ' ' * 5
-            line += f'   {commit.hash}'
+            line += f'   {commit.hash[:10]}'
+            line += f'  {self.colors.magenta(commit.author_email)}'
             self.print(line)
             prev_count = commit.lines_count
         return 0
