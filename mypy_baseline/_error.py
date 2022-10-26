@@ -25,7 +25,7 @@ REX_LINE = re.compile(rf"""
 @dataclass
 class Error:
     raw_line: str
-    _match: re.Match
+    _match: re.Match[str]
 
     @classmethod
     def new(self, line: str) -> Error | None:

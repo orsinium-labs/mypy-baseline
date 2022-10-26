@@ -23,7 +23,7 @@ class Command:
     def run(self) -> int:
         raise NotImplementedError
 
-    def print(self, *args: str, end='\n', sep=' ') -> None:
+    def print(self, *args: str, end: str = '\n', sep: str = ' ') -> None:
         print(*args, file=self.stdout, end=end, sep=sep)
 
     @cached_property

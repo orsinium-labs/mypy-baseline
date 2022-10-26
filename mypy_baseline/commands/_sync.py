@@ -24,6 +24,7 @@ class Sync(Command):
             clean_line = error.get_clean_line(self.config)
             baseline.append(clean_line)
 
+        synced = False
         if old_baseline:
             synced = self._stable_sync(old_baseline, baseline)
         if not synced:
