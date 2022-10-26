@@ -106,7 +106,7 @@ There are 2 commands to show how the baseline has changed over time:
     1. Praise merge request author for removing lines from `mypy-baseline.txt`.
     1. Question them for adding new lines in `mypy-baseline.txt`. There should be no new violations. Don't accumulate tech debt without a very good reason. Resolve all type errors right away whenever possible.
     1. Question them adding `# type: ignore`. There (almost) always a way to resolve an error instead of just ignoring it. However, it's not always obvious how. Help them find the way.
-    1. If you see some mistakes in type annotations, gently tell tham
+    1. If you see some mistakes in type annotations, gently tell them how to fix it.
 1. **Resolve all type errors in the code**. Your ultimate goal is to resolve all errors you have and get rid of mypy-baseline.
     1. As mentioned in "Integrate mypy-baseline with the project", start with the most friendly and relaxed mypy config.
     1. Try adding some third-party plugins, like [django-stubs](https://github.com/typeddjango/django-stubs). Sometimes, they bring the number of detected violations down, not up. If that the case for your project, use it. If not, don't use them just yet, leave it for later.
