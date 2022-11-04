@@ -95,7 +95,6 @@ class Filter(Command):
                 new_formatted = f'{new: >+3}'
                 line += f' {self.colors.red(new_formatted)}'
             self.print(line)
-        self.print()
 
         msg = self.colors.get_exit_message(fixed=fixed_count, new=new_count)
         self.print(msg)

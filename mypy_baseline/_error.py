@@ -20,6 +20,7 @@ REX_LINE = re.compile(rf"""
     (?:\s\s{COLOR_PATTERN}\[(?P<category>[a-z-]+)\]{COLOR_PATTERN})?
     \s*
 """, re.VERBOSE | re.MULTILINE)
+REX_LINE_IN_MSG = re.compile(r'defined on line \d+')
 
 
 @dataclass
@@ -60,6 +61,7 @@ class Error:
         path = Path(*self.path.parts[:config.depth])
         pos = self.line_number if config.preserve_position else 0
         msg = REX_COLOR.sub('', self.message).strip()
+        msg = REX_LINE_IN_MSG.sub('defined on line 0', msg)
         line = f'{path}:{pos}: {self.severity}: {msg}'
         if self.category != 'note':
             line += f'  [{self.category}]'
