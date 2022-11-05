@@ -15,20 +15,22 @@ class Sync(Command):
             baseline_text = ''
         old_baseline = baseline_text.splitlines()
 
-        baseline: list[str] = []
+        new_baseline: list[str] = []
         for line in self.stdin:
             error = Error.new(line)
             if error is None:
                 self.print(line, end='')
                 continue
+            if self.config.is_ignored(error.message):
+                continue
             clean_line = error.get_clean_line(self.config)
-            baseline.append(clean_line)
+            new_baseline.append(clean_line)
 
         synced = False
         if old_baseline:
-            synced = self._stable_sync(old_baseline, baseline)
+            synced = self._stable_sync(old_baseline, new_baseline)
         if not synced:
-            self._write_baseline(baseline)
+            self._write_baseline(new_baseline)
         return 0
 
     def _stable_sync(self, old_bline: list[str], new_bline: list[str]) -> bool:

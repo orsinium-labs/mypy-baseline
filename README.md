@@ -16,6 +16,8 @@ Features:
 + Can detect exactly what errors were introduced and what errors were resolved, even if they are in the same file.
 + Baseline is carefully crafted to avoid merge conflicts.
 + Baseline is human-readable, and diffs are informative. The reviewers of your PR will know exactly what errors you resolve and what errors you introduced.
++ Track the progress you make with git-based history of changes and burndown chart of resolved type violations.
++ Ignore speicific error messages (using regular expressions), so that buggy mypy plugins don't bother you with false-positives.
 
 ## Installation
 
@@ -64,6 +66,8 @@ preserve_position = False
 hide_stats = False
 # --no-colors: do not use colors in stats
 no_colors = False
+# --ignore: regexes for error messages to ignore
+ignore = []
 ```
 
 ## History

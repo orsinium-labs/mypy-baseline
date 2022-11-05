@@ -25,6 +25,8 @@ class Filter(Command):
             if error is None:
                 self.print(line, end='')
                 continue
+            if self.config.is_ignored(error.message):
+                continue
             clean_line = error.get_clean_line(self.config)
             try:
                 baseline.remove(clean_line)
@@ -95,7 +97,6 @@ class Filter(Command):
                 new_formatted = f'{new: >+3}'
                 line += f' {self.colors.red(new_formatted)}'
             self.print(line)
-        self.print()
 
         msg = self.colors.get_exit_message(fixed=fixed_count, new=new_count)
         self.print(msg)

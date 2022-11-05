@@ -1,9 +1,11 @@
 from __future__ import annotations
+from functools import cached_property
 
 import os
 from argparse import ArgumentParser
-from dataclasses import dataclass, fields, replace
+import dataclasses
 from pathlib import Path
+import re
 from typing import Any
 
 
@@ -21,7 +23,7 @@ except ImportError:
         tomli = None   # type: ignore[assignment]
 
 
-@dataclass
+@dataclasses.dataclass
 class Config:
     baseline_path: Path = Path('mypy-baseline.txt')
     depth: int = 40
@@ -29,6 +31,7 @@ class Config:
     preserve_position: bool = False
     hide_stats: bool = False
     no_colors: bool = bool(os.environ.get('NO_COLOR'))
+    ignore: list[str] = dataclasses.field(default_factory=list)
 
     @classmethod
     def from_args(cls, args: dict[str, Any]) -> Config:
@@ -71,6 +74,10 @@ class Config:
             '--no-colors', action='store_true',
             help='disable colored output. Has no effect on the output of mypy.',
         )
+        add(
+            '--ignore', nargs='*',
+            help='regexes for messages to ignore.',
+        )
 
     def read_file(self, path: Path) -> Config:
         if not path.exists():
@@ -94,12 +101,28 @@ class Config:
                 data = data['tool']['mypy_baseline']
             except KeyError:
                 return self
-        return replace(self, **data)
+        return dataclasses.replace(self, **data)
 
     def read_args(self, args: dict[str, Any]) -> Config:
-        config = replace(self)
-        for field in fields(self):
+        config = dataclasses.replace(self)
+        for field in dataclasses.fields(self):
             value = args[field.name]
             if value is not None:
                 setattr(config, field.name, value)
         return config
+
+    @cached_property
+    def _ignore_regexes(self) -> list[re.Pattern[str]]:
+        result = []
+        assert isinstance(self.ignore, list)
+        for pattern in self.ignore:
+            try:
+                result.append(re.compile(pattern))
+            except re.error:
+                raise ValueError(f'Invalid pattern: {pattern}')
+        return result
+
+    def is_ignored(self, msg: str) -> bool:
+        """Check if the message matches any ignore pattern from the config.
+        """
+        return any(rex.fullmatch(msg) for rex in self._ignore_regexes)
