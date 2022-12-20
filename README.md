@@ -82,10 +82,10 @@ There are 2 commands to show how the baseline has changed over time:
 ## How to
 
 1. **Integrate mypy-baseline with the project**:
-    1. The "Usage" section above covers the basic integration. To summarize, you generate the initial baseline with `mypy | mypy-baseline sync`, and then all consequentice runs of `mypy | mypy-basleine filter` will ignore these errors.
+    1. The "Usage" section above covers the basic integration. To summarize, you generate the initial baseline with `mypy | mypy-baseline sync`, and then all consequentice runs of `mypy | mypy-baseline filter` will ignore these errors.
     If you have something like [Taskfile](https://taskfile.dev/) or [Makefile](https://www.gnu.org/software/make/manual/make.html), it's good to provide tasks for both commands, for your team's convenience.
     1. Start with the most friendly and relaxed mypy config. Allow everything that can be allowed. For instance, set `allow_redefinition = true`. That will allow you to focus on the most important errors for now.
-    1. `mypy-basleine.txt` should be committed into the repository, so it's always the same and up-to-date for everyone in the team.
+    1. `mypy-baseline.txt` should be committed into the repository, so it's always the same and up-to-date for everyone in the team.
     1. Don't forget to integrate it with CI.
     1. And lastly, tell your team about mypy, mypy-baseline, and how to use it. Write some internal documentation, make a tech talk, and support them when they struggle to understand why mypy complaints about something.
 1. **Encourage your team to resolve old errors**. The purpose of mypy-baseline not to let you ignore all existing errors in the project, but to let you resolve them gradually, start using mypy right now, and make sure nobody introduces new errors. That's why it's important to bring one day the number of mypy errors to zero. And that should be a team effort.
@@ -105,7 +105,7 @@ There are 2 commands to show how the baseline has changed over time:
     1. Don't forget to run `mypy | mypy-baseline sync` when you finish.
 1. **Keep mypy-baseline in sync**.
     1. By default, mypy-baseline will fail if there are resolved but unsynced errors. The reason for that is to keep `mypy-baseline.txt` always up-to-date. If you don't do that, it will be hard for others to see what errors their changes resolved. Think about others.
-    1. If mypy-basleine tells you "your changes resolved existing violations", you need to run `mypy | mypy-baseline sync`. It will actualize `mypy-baseline.txt` for you.
+    1. If mypy-baseline tells you "your changes resolved existing violations", you need to run `mypy | mypy-baseline sync`. It will actualize `mypy-baseline.txt` for you.
 1. **Review merge requests**.
     1. Praise merge request author for removing lines from `mypy-baseline.txt`.
     1. Question them for adding new lines in `mypy-baseline.txt`. There should be no new violations. Don't accumulate tech debt without a very good reason. Resolve all type errors right away whenever possible.
