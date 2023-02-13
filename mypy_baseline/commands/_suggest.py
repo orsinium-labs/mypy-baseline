@@ -22,10 +22,6 @@ class Suggest(Command):
             help='seed to use when randomly picking a suggestion',
         )
         parser.add_argument(
-            '--target',
-            help='the target branch for the PR',
-        )
-        parser.add_argument(
             '--min-fixed', default=1,
             help='required number of fixes for the MR',
         )
@@ -46,8 +42,8 @@ class Suggest(Command):
     def target(self) -> str:
         """Get the target branch/commit reference for this PR.
         """
-        if self.args.target:
-            return self.args.target
+        if self.config.default_branch:
+            return self.config.default_branch
         target = os.environ.get('CI_MERGE_REQUEST_TARGET_BRANCH_SHA')
         if target:
             return target
@@ -65,7 +61,7 @@ class Suggest(Command):
         """
         lines = self._get_stdout(
             'git', 'diff',
-            'HEAD', self.target,
+            'HEAD', self.target, '--',
             str(self.config.baseline_path),
         )
         count = 0
