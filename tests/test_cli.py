@@ -1,15 +1,21 @@
+from __future__ import annotations
+
 from io import StringIO
 from pathlib import Path
 
 from mypy_baseline import main
 
 
-def test_version():
+def run(cmd: list[str]) -> str:
     stdout = StringIO()
-    code = main(['version'], StringIO(), stdout)
+    code = main(cmd, StringIO(), stdout)
     assert code == 0
     stdout.seek(0)
-    actual = stdout.read()
+    return stdout.read()
+
+
+def test_version():
+    actual = run(['version'])
     assert actual.count('.') == 2
 
 
@@ -50,12 +56,7 @@ def test_filter():
 
 
 def test_filter__empty_stdin():
-    stdin = StringIO()
-    stdout = StringIO()
-    code = main(['filter'], stdin, stdout)
-    assert code == 0
-    stdout.seek(0)
-    actual = stdout.read()
+    actual = run(['filter'])
     assert actual == ''
 
 
@@ -63,11 +64,7 @@ def test_top_files(tmp_path: Path):
     blpath = tmp_path / 'bline.txt'
     blpath.write_text(f'{LINE1}{LINE2}')
     cmd = ['top-files', '--baseline-path', str(blpath), '--no-color']
-    stdout = StringIO()
-    code = main(cmd, StringIO(), stdout)
-    assert code == 0
-    stdout.seek(0)
-    actual = stdout.read()
+    actual = run(cmd)
     assert 'views.py' in actual
     assert 'settings.py' in actual
 
@@ -75,10 +72,6 @@ def test_top_files(tmp_path: Path):
 def test_history():
     readme_path = Path(__file__).parent.parent / 'README.md'
     cmd = ['history', '--baseline-path', str(readme_path), '--no-color']
-    stdout = StringIO()
-    code = main(cmd, StringIO(), stdout)
-    assert code == 0
-    stdout.seek(0)
-    actual = stdout.read()
+    actual = run(cmd)
     exp = '2022-09-01 11:45:28+02:00  60 =   3   -1  +58   8fe7afd10c  git@orsinium.dev'
     assert exp in actual
