@@ -6,6 +6,7 @@ from ._base import Command
 from ._filter import Filter
 from ._history import History
 from ._plot import Plot
+from ._suggest import Suggest
 from ._sync import Sync
 from ._top_files import TopFiles
 from ._version import Version
@@ -16,6 +17,7 @@ commands = MappingProxyType({
     'filter': Filter,
     'history': History,
     'plot': Plot,
+    'suggest': Suggest,
     'sync': Sync,
     'top-files': TopFiles,
     'version': Version,
