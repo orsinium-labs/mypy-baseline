@@ -1,13 +1,14 @@
 from __future__ import annotations
-from argparse import ArgumentParser
-from functools import cached_property
+
 import os
-from pathlib import Path
 import random
 import subprocess
+from argparse import ArgumentParser
+from functools import cached_property
+from pathlib import Path
 
-from ._base import Command
 from .._error import Error
+from ._base import Command
 
 
 class Suggest(Command):
