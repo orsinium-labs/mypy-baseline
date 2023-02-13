@@ -6,6 +6,7 @@ import subprocess
 from argparse import ArgumentParser
 from functools import cached_property
 from pathlib import Path
+from typing import Iterable
 
 from .._error import Error
 from ._base import Command
@@ -45,16 +46,15 @@ class Suggest(Command):
         """
         if self.config.default_branch:
             return self.config.default_branch
+
+        # detect default branch from env vars on GitLab CI
         target = os.environ.get('CI_MERGE_REQUEST_TARGET_BRANCH_SHA')
         if target:
             return target
 
-        cmd = ['git', 'symbolic-ref', 'refs/remotes/origin/HEAD']
-        result = subprocess.run(cmd, stdout=subprocess.PIPE)
-        result.check_returncode()
-        stdout = result.stdout.decode().strip()
-        default_branch = stdout.split('/')[-1]
-        return default_branch
+        # detect default branch for the `origin` remote
+        lines = self._get_stdout('git', 'symbolic-ref', 'refs/remotes/origin/HEAD')
+        return lines[-1].split('/')[-1]
 
     @cached_property
     def fixed_count(self) -> int:
@@ -88,6 +88,8 @@ class Suggest(Command):
 
     @property
     def suggested(self) -> Error:
+        """Pick a violation that shoud be suggested to fix.
+        """
         # pick an error in one of the changed files
         for error in self.baseline:
             if error.path.absolute() in self.changed_files:
@@ -98,14 +100,26 @@ class Suggest(Command):
 
     @cached_property
     def baseline(self) -> list[Error]:
-        text = self.config.baseline_path.read_text(encoding='utf8')
-        lines = text.splitlines()
+        """Parse errors from the baseline.
+        """
         baseline: list[Error] = []
-        for line in lines:
+        for line in self.baseline_lines:
             err = Error.new(line)
             if err is not None:
                 baseline.append(err)
         return baseline
+
+    @property
+    def baseline_lines(self) -> Iterable[str]:
+        """Read baseline and return lines of it, one per violation.
+
+        If stdin is available, read from stdin.
+        Otherwise, read from the file.
+        """
+        if not self.stdin.isatty():
+            return self.stdin
+        text = self.config.baseline_path.read_text(encoding='utf8')
+        return text.splitlines()
 
     @cached_property
     def seed(self) -> str:
