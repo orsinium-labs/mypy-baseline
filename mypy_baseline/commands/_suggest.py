@@ -1,4 +1,5 @@
 from __future__ import annotations
+from argparse import ArgumentParser
 from functools import cached_property
 import os
 from pathlib import Path
@@ -10,19 +11,43 @@ from .._error import Error
 
 
 class Suggest(Command):
-    """Suggest which baselined violations to fix.
+    """Suggest to fix a violation from the baseline.
     """
 
+    @staticmethod
+    def init_parser(parser: ArgumentParser) -> None:
+        Command.init_parser(parser)
+        parser.add_argument(
+            '--seed',
+            help='seed to use when randomly picking a suggestion',
+        )
+        parser.add_argument(
+            '--target',
+            help='the target branch for the PR',
+        )
+        parser.add_argument(
+            '--min-fixed', default=1,
+            help='required number of fixes for the MR',
+        )
+        parser.add_argument(
+            '--exit-zero', action='store_true',
+            help='always return zero exit code',
+        )
+
     def run(self) -> int:
-        if self.fixes_count:
+        if self.fixed_count >= self.args.min_fixed:
             return 0
-        print(self.suggested.raw_line)
+        self.print(self.suggested.raw_line)
+        if self.args.exit_zero:
+            return 0
         return 1
 
     @cached_property
     def target(self) -> str:
         """Get the target branch/commit reference for this PR.
         """
+        if self.args.target:
+            return self.args.target
         target = os.environ.get('CI_MERGE_REQUEST_TARGET_BRANCH_SHA')
         if target:
             return target
@@ -35,7 +60,7 @@ class Suggest(Command):
         return default_branch
 
     @cached_property
-    def fixes_count(self) -> int:
+    def fixed_count(self) -> int:
         """Get number of baseline violations fixed in this PR.
         """
         lines = self._get_stdout(
@@ -71,7 +96,7 @@ class Suggest(Command):
             if error.path.absolute() in self.changed_files:
                 return error
         # pick a random error
-        random.seed(13)
+        random.seed(self.seed)
         return random.choice(self.baseline)
 
     @cached_property
@@ -81,6 +106,21 @@ class Suggest(Command):
         baseline: list[Error] = []
         for line in lines:
             err = Error.new(line)
-            if err:
+            if err is not None:
                 baseline.append(err)
         return baseline
+
+    @cached_property
+    def seed(self) -> str:
+        """Get the seed to init randomizer.
+
+        If `--seed` is not specified, try to pick value
+        so that it's always the same for the same MR
+        but different for different MRs.
+        """
+        if self.args.seed:
+            return self.args.seed
+        mr_id = os.environ.get('CI_MERGE_REQUEST_ID')
+        if mr_id:
+            return mr_id
+        return ''
