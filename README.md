@@ -48,28 +48,6 @@ mypy | mypy-baseline filter
 
 If you introduce new errors, resolve them. If you resolve existing errors, run `mypy-baseline sync` again to re-generate baseline. In both cases, mypy-baseline will tell you what's wrong and what to do. Enjoy the ride!
 
-## Configuration
-
-The tool has a number of CLI flags to configure the behavior of `filter`. The default value for each flag can be specified in `pyproject.toml`. There are all the configuration options and their defaults:
-
-```python
-[tool.mypy-baseline]
-# --baseline-path: the file where the baseline should be stored
-baseline_path = "mypy-baseline.txt"
-# --depth: cut path names longer than that many directories deep
-depth = 40
-# --allow-unsynced: do not fail for unsynced resolved errors
-allow_unsynced = False
-# --preserve-position: do not remove error position from the baseline
-preserve_position = False
-# --hide-stats: do not show stats and messages at the end
-hide_stats = False
-# --no-colors: do not use colors in stats
-no_colors = False
-# --ignore: regexes for error messages to ignore
-ignore = []
-```
-
 ## History
 
 There are 2 commands to show how the baseline has changed over time:
@@ -123,7 +101,7 @@ And whatever happens, be brave. Tinker, experiment, hack, and observe.
 
 This is the list of all subcommands mypy-baseline provides:
 
-```plain
+```text
 filter              Filter out old mypy errors from stdin.
 history             Show how the baseline changed over time.
 plot                Draw the graph of how the baseline changed over time.
