@@ -27,7 +27,22 @@ keywords = [
 dependencies = []
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov"]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+lint = [
+    "flake8",
+    "isort",
+    "mypy",
+    "types-toml",
+    "unify",
+]
+docs = [
+    "sphinx",
+    "myst-parser",
+]
+
 
 [project.urls]
 Source = "https://github.com/orsinium-labs/mypy-baseline"
