@@ -31,3 +31,11 @@ When mypy-baseline tells you that you introduced new errors and you need to reso
 The order of lines in the baseline file depends on the order in which mypy resolved the files. And that order may be different on different machines. We try to minimize such cases and avoid lines jumping around, but it's still possible. And when it happens, it may cause merge conflicts.
 
 The best you can do when you encounter a merge conflict is to re-generate the baseline by running `mypy | mypy-baseline sync`.
+
+## Deal with false-positives
+
+Mypy and its ecosystem is widely used, battle-tested, and made by smart people. False-positives are possible but rare. When you see a violation reported by mypy, considering it a false-positive and simply ignoring must be your very last option.
+
+1. Check if all you type annotations are correct. For instance, if you assign to a variable a `list`, then assign to the same variable a `tuple`, and mypy complaints about it, consider annotating the variable as a `Sequence` or similar.
+1. Some errors might be a sign of a bad design. For instance, mypy requires you to follow [Liskov substitution principle](https://en.wikipedia.org/wiki/Liskov_substitution_principle), and methods violating it will be reported. The best you can do in such cases is to refactor it.
+1. Don't be afraid to ask for help your coworkers or online. Some errors might look cryptic for newcomers, and nobody will blame you for not understanding how to fix it right away.

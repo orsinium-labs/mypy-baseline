@@ -4,11 +4,11 @@ This page provides guides and tips for the person who takes the initiative to in
 
 ## Integrate mypy-baseline with the project
 
-1. The "Usage" section above covers the basic integration. To summarize, you generate the initial baseline with `mypy | mypy-baseline sync`, and then all consequentice runs of `mypy | mypy-baseline filter` will ignore these errors.
+1. The [Usage](./usage.md) page covers the basic integration. To summarize, you generate the initial baseline with `mypy | mypy-baseline sync`, and then all consequentice runs of `mypy | mypy-baseline filter` will ignore these errors.
 If you have something like [Taskfile](https://taskfile.dev/) or [Makefile](https://www.gnu.org/software/make/manual/make.html), it's good to provide tasks for both commands, for your team's convenience.
 1. Start with the most friendly and relaxed mypy config. Allow everything that can be allowed. For instance, set `allow_redefinition = true`. That will allow you to focus on the most important errors for now.
 1. `mypy-baseline.txt` should be committed into the repository, so it's always the same and up-to-date for everyone in the team.
-1. Don't forget to integrate it with CI.
+1. Don't forget to integrate mypy-baseline with CI.
 1. And lastly, tell your team about mypy, mypy-baseline, and how to use it. Write some internal documentation, make a tech talk, and support them when they struggle to understand why mypy complaints about something. It's a good idea to make a Slack channel where people can ask their mypy-related questions.
 
 ## Encourage your team to resolve old errors
@@ -34,3 +34,7 @@ Your ultimate goal is to resolve all errors you have and get rid of mypy-baselin
 1. Try adding some third-party plugins, like [django-stubs](https://github.com/typeddjango/django-stubs). Sometimes, they bring the number of detected violations down, not up. If that the case for your project, use it. If not, don't use them just yet, leave it for later.
 1. When you resolve at least 80% of existing errors, make mypy config a bit more strict, and repeat the process. Then make it more strict again.
 1. When you're happy with the config, it's time to integrate mypy-plugins and stubs you haven't integrated yet. See [awesome-python-typing](https://github.com/typeddjango/awesome-python-typing) for what is available.
+
+## Deal with false-positives
+
+It's possible (especially if you use third-party mypy plugins) that one day you'll encounter a false-positive that produces tons of violations for your project. If you sync these violations with the baseline or add `# type: ignore` for each, you still will get them when a new code is added. And that will confuse people and encourage a bad practice of mindlessly ignoring new violations. Don't do that. Instead, use `ignore` [configuration option](./config.md) to ignore the troublesome error altogether until it gets fixed upstream.

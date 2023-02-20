@@ -27,14 +27,7 @@ python3 -m pip install mypy-baseline
 
 ## Usage
 
-First of all, make sure mypy includes the error codes in the output. Here is an example (`pyproject.toml`):
-
-```toml
-[tool.mypy]
-show_error_codes = true
-```
-
-Now, you need to create the baseline (it will be stored in `mypy-baseline.txt` by default):
+Create the baseline (it will be stored in `mypy-baseline.txt` by default):
 
 ```bash
 mypy | mypy-baseline sync
@@ -47,16 +40,3 @@ mypy | mypy-baseline filter
 ```
 
 If you introduce new errors, resolve them. If you resolve existing errors, run `mypy-baseline sync` again to re-generate baseline. In both cases, mypy-baseline will tell you what's wrong and what to do. Enjoy the ride!
-
-## All commands
-
-This is the list of all subcommands mypy-baseline provides:
-
-```text
-filter              Filter out old mypy errors from stdin.
-history             Show how the baseline changed over time.
-plot                Draw the graph of how the baseline changed over time.
-sync                Generate baseline with all existing errors.
-top-files           Show files with the most errors.
-version             Print the version of mypy-baseline.
-```

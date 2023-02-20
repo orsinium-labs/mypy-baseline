@@ -5,7 +5,7 @@ The `mypy-baseline history` command prints in terminal commits that modified the
 The command works with [git log](https://git-scm.com/docs/git-log). So, to run the command, you need the baseline to be tracked in a git repository and git to be installed on the machine.
 
 ```bash
-python3 -m mypy_baseline history
+mypy-baseline history
 ```
 
 Columns:

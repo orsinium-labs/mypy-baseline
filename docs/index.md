@@ -22,6 +22,9 @@
     :maxdepth: 1
     :caption: Commands
 
+    sync
+    filter
     history
     plot
+    top-files
 ```
