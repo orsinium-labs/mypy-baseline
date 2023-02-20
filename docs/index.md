@@ -1,4 +1,4 @@
-# walnats
+# mypy-baseline
 
 ```{include} ../README.md
 :start-after: "# mypy-baseline"
@@ -11,8 +11,17 @@
 
 .. toctree::
     :maxdepth: 1
-    :caption: Basics
+    :caption: Guides
 
     usage
     config
+    leader
+    follower
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Commands
+
+    history
+    plot
 ```
