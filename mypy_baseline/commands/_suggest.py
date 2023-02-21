@@ -53,16 +53,30 @@ class Suggest(Command):
             return target
 
         # detect default branch for the `origin` remote
-        lines = self._get_stdout('git', 'symbolic-ref', 'refs/remotes/origin/HEAD')
-        return lines[-1].split('/')[-1]
+        # (may fail if there is no remote)
+        try:
+            lines = self._get_stdout('symbolic-ref', 'refs/remotes/origin/HEAD')
+        except subprocess.CalledProcessError:
+            pass
+        else:
+            return lines[-1].split('/')[-1]
+
+        # try well-known branch names
+        for branch_name in ('main', 'master', 'develop'):
+            res = subprocess.run(
+                ['git', 'rev-parse', '--verify', branch_name],
+                stdout=subprocess.DEVNULL,
+            )
+            if res.returncode == 0:
+                return branch_name
+        raise LookupError('cannot detect default branch name')
 
     @cached_property
     def fixed_count(self) -> int:
         """Get number of baseline violations fixed in this PR.
         """
         lines = self._get_stdout(
-            'git', 'diff',
-            'HEAD', self.target, '--',
+            'diff', 'HEAD', self.target, '--',
             str(self.config.baseline_path),
         )
         count = 0
@@ -75,13 +89,13 @@ class Suggest(Command):
     def changed_files(self) -> tuple[Path, ...]:
         """Get all lines changed in this PR.
         """
-        lines = self._get_stdout('git', 'diff', '--name-only', self.target)
+        lines = self._get_stdout('diff', '--name-only', self.target)
         return tuple(Path(line).absolute() for line in lines)
 
-    def _get_stdout(self, *cmd: str) -> list[str]:
+    def _get_stdout(self, *args: str) -> list[str]:
         """Run the command in the shell and get stdout lines.
         """
-        result = subprocess.run(cmd, stdout=subprocess.PIPE)
+        result = subprocess.run(['git', *args], stdout=subprocess.PIPE)
         result.check_returncode()
         stdout = result.stdout.decode().strip()
         return stdout.splitlines()
@@ -107,6 +121,8 @@ class Suggest(Command):
             err = Error.new(line)
             if err is not None:
                 baseline.append(err)
+        if not baseline:
+            raise RuntimeError('baseline is empty')
         return baseline
 
     @property
@@ -116,8 +132,8 @@ class Suggest(Command):
         If stdin is available, read from stdin.
         Otherwise, read from the file.
         """
-        if not self.stdin.isatty():
-            return self.stdin
+        # if not self.stdin.isatty():
+        #     return self.stdin
         text = self.config.baseline_path.read_text(encoding='utf8')
         return text.splitlines()
 
