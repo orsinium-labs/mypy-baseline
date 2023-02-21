@@ -4,3 +4,7 @@ __pycache__/
 /htmlcov/
 /dist/
 /.hypothesis/
+/.task/
+/.venvs/
+/docs/assets
+/docs/build/
