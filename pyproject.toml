@@ -30,7 +30,6 @@ dependencies = []
 test = [
     "pytest",
     "pytest-cov",
-    "gitpython",
 ]
 lint = [
     "flake8",

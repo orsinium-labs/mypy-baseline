@@ -12,6 +12,20 @@ from .._error import Error
 from ._base import Command
 
 
+TARGET_BRANCH_ENV_VARS = (
+    # GitLab CI
+    'CI_MERGE_REQUEST_TARGET_BRANCH_SHA',
+    # GitHub Actions
+    'GITHUB_BASE_REF',
+)
+PR_ID_ENV_VARS = (
+    # GitLab CI
+    'CI_MERGE_REQUEST_ID',
+    # GitHub Actions
+    'GITHUB_REF_NAME',
+)
+
+
 class Suggest(Command):
     """Suggest to fix a violation from the baseline.
     """
@@ -47,10 +61,11 @@ class Suggest(Command):
         if self.config.default_branch:
             return self.config.default_branch
 
-        # detect default branch from env vars on GitLab CI
-        target = os.environ.get('CI_MERGE_REQUEST_TARGET_BRANCH_SHA')
-        if target:
-            return target
+        # detect default branch from env vars
+        for env_var in TARGET_BRANCH_ENV_VARS:
+            target = os.environ.get(env_var)
+            if target:
+                return target
 
         # detect default branch for the `origin` remote
         # (may fail if there is no remote)
@@ -104,13 +119,16 @@ class Suggest(Command):
     def suggested(self) -> Error:
         """Pick a violation that shoud be suggested to fix.
         """
+        errors = [e for e in self.baseline if e.severity == 'error']
+        if not errors:
+            errors = self.baseline
         # pick an error in one of the changed files
-        for error in self.baseline:
+        for error in errors:
             if error.path.absolute() in self.changed_files:
                 return error
         # pick a random error
         random.seed(self.seed)
-        return random.choice(self.baseline)
+        return random.choice(errors)
 
     @cached_property
     def baseline(self) -> list[Error]:
@@ -128,9 +146,6 @@ class Suggest(Command):
     @property
     def baseline_lines(self) -> Iterable[str]:
         """Read baseline and return lines of it, one per violation.
-
-        If stdin is available, read from stdin.
-        Otherwise, read from the file.
         """
         # if not self.stdin.isatty():
         #     return self.stdin
@@ -147,7 +162,8 @@ class Suggest(Command):
         """
         if self.args.seed:
             return self.args.seed
-        mr_id = os.environ.get('CI_MERGE_REQUEST_ID')
-        if mr_id:
-            return mr_id
+        for env_var in PR_ID_ENV_VARS:
+            pr_id = os.environ.get(env_var)
+            if pr_id:
+                return pr_id
         return ''
