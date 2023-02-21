@@ -134,6 +134,8 @@ tasks:
       - install:docs
     cmds:
       - rm -rf docs/build
+      - rm docs/assets
+      - ln -s {{.PWD}}/assets docs/
       - "{{.DOCS_ENV}}/bin/sphinx-build -W docs docs/build {{.CLI_ARGS}}"
 
   # groups

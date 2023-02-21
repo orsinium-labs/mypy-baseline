@@ -6,3 +6,5 @@ __pycache__/
 /.hypothesis/
 /.task/
 /.venvs/
+/docs/assets
+/docs/build/
