@@ -5,6 +5,8 @@
 :end-before: "## Usage"
 ```
 
+Source code is available on GitHub: [github.com/orsinium-labs/mypy-baseline](https://github.com/orsinium-labs/mypy-baseline)
+
 ## Documentation
 
 ```{eval-rst}
