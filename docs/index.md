@@ -26,6 +26,7 @@ Source code is available on GitHub: [github.com/orsinium-labs/mypy-baseline](htt
 
     sync
     filter
+    suggest
     history
     plot
     top-files
