@@ -32,6 +32,7 @@ class Config:
     hide_stats: bool = False
     no_colors: bool = bool(os.environ.get('NO_COLOR'))
     ignore: list[str] = dataclasses.field(default_factory=list)
+    default_branch: str = ''
 
     @classmethod
     def from_args(cls, args: dict[str, Any]) -> Config:
@@ -77,6 +78,10 @@ class Config:
         add(
             '--ignore', nargs='*',
             help='regexes for messages to ignore.',
+        )
+        add(
+            '--default-branch',
+            help='default git branch name.',
         )
 
     def read_file(self, path: Path) -> Config:
