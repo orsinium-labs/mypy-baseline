@@ -10,11 +10,13 @@ from typing import Iterable
 
 from .._error import Error
 from ._base import Command
+from .._config import Config
 
 
 TARGET_BRANCH_ENV_VARS = (
     # GitLab CI
     'CI_MERGE_REQUEST_TARGET_BRANCH_SHA',
+    'CI_MERGE_REQUEST_TARGET_BRANCH_NAME',
     # GitHub Actions
     'GITHUB_BASE_REF',
 )
@@ -49,7 +51,12 @@ class Suggest(Command):
     def run(self) -> int:
         if self.fixed_count >= self.args.min_fixed:
             return 0
-        self.print(self.suggested.raw_line)
+        suggested = self.suggested
+        # reviewdog for GitLab requires line number to be 1+.
+        # https://github.com/reviewdog/reviewdog/issues/760
+        suggested.line_number = 1
+        result = suggested.get_clean_line(Config(preserve_position=True))
+        self.print(result)
         if self.args.exit_zero:
             return 0
         return 1

@@ -58,7 +58,7 @@ def test_suggest(repo_path: Path):
     run_git('checkout', '-b', 'feature-branch')
     cmd = ['suggest', '--baseline-path', str(bline_path)]
     stdout = run(cmd, exit_code=1)
-    assert LINE1.strip() == stdout.strip()
+    assert stdout.strip() == LINE1.strip().replace(':69:', ':1:')
 
 
 def test_target_branch__cli_flag():
