@@ -8,9 +8,9 @@ from functools import cached_property
 from pathlib import Path
 from typing import Iterable
 
+from .._config import Config
 from .._error import Error
 from ._base import Command
-from .._config import Config
 
 
 TARGET_BRANCH_ENV_VARS = (
