@@ -30,11 +30,14 @@ dependencies = []
 test = [
     "pytest",
     "pytest-cov",
+    "requests",
+    "responses",
 ]
 lint = [
     "flake8",
     "isort",
     "mypy",
+    "types-requests",
     "types-toml",
     "unify",
 ]

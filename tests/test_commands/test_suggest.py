@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Iterator
 
 import pytest
+from responses import RequestsMock
 
 from mypy_baseline._config import Config
 from mypy_baseline.commands import Suggest
@@ -58,7 +59,7 @@ def test_suggest(repo_path: Path):
     run_git('checkout', '-b', 'feature-branch')
     cmd = ['suggest', '--baseline-path', str(bline_path)]
     stdout = run(cmd, exit_code=1)
-    assert stdout.strip() == LINE1.strip().replace(':69:', ':1:')
+    assert stdout.strip() == LINE1.strip()
 
 
 def test_target_branch__cli_flag():
@@ -80,3 +81,27 @@ def test_target_branch__env_var(env_var: str):
     with set_env_vars({env_var: 'something'}):
         cmd = Suggest(args=args, stdin=StringIO(), stdout=StringIO())
         assert cmd.target == 'something'
+
+
+def test_comment():
+    parser = ArgumentParser()
+    Suggest.init_parser(parser)
+    args = parser.parse_args([])
+    cmd = Suggest(args=args, stdin=StringIO(), stdout=StringIO())
+    env_vars = dict(
+        CI_API_V4_URL='https://gitlab.example.com/api/v4/',
+        CI_MERGE_REQUEST_PROJECT_ID='123',
+        CI_MERGE_REQUEST_IID='456',
+        GITLAB_API_TOKEN='glab-789',
+        GITLAB_CI='yes',
+    )
+    with RequestsMock() as responses:
+        responses.get(
+            'https://gitlab.example.com/api/v4//projects/123/merge_requests/456/notes',
+            json=[],
+        )
+        responses.post(
+            'https://gitlab.example.com/api/v4//projects/123/merge_requests/456/notes',
+        )
+        with set_env_vars(env_vars):
+            cmd._post_to_gitlab('oh hi mark')

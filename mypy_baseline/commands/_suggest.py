@@ -6,6 +6,7 @@ import subprocess
 from argparse import ArgumentParser
 from functools import cached_property
 from pathlib import Path
+from textwrap import dedent
 from typing import Iterable
 
 from .._config import Config
@@ -47,16 +48,19 @@ class Suggest(Command):
             '--exit-zero', action='store_true',
             help='always return zero exit code',
         )
+        parser.add_argument(
+            '--comment', action='store_true',
+            help='add comment to the GitLab MR discussion',
+        )
 
     def run(self) -> int:
         if self.fixed_count >= self.args.min_fixed:
             return 0
-        suggested = self.suggested
-        # reviewdog for GitLab requires line number to be 1+.
-        # https://github.com/reviewdog/reviewdog/issues/760
-        suggested.line_number = 1
-        result = suggested.get_clean_line(Config(preserve_position=True))
+        config = Config(preserve_position=True)
+        result = self.suggested.get_clean_line(config)
         self.print(result)
+        if self.args.comment:
+            self._post_to_gitlab(result)
         if self.args.exit_zero:
             return 0
         return 1
@@ -174,3 +178,67 @@ class Suggest(Command):
             if pr_id:
                 return pr_id
         return ''
+
+    def _post_to_gitlab(self, err_msg: str) -> None:
+        """Add a comment to the GitLab MR for which the job runs.
+        """
+        import requests
+
+        # get API token
+        is_gitlab = os.environ.get('GITLAB_CI')
+        if not is_gitlab:
+            raise LookupError('Not running on GitLab CI')
+        token = os.environ.get('REVIEWDOG_GITLAB_API_TOKEN')
+        if not token:
+            token = os.environ.get('GITLAB_API_TOKEN')
+        if not token:
+            raise LookupError('GITLAB_API_TOKEN env var is not set')
+
+        already_commented = self._check_gitlab_has_comment(token)
+        if already_commented:
+            return
+
+        # form the message
+        s = 's' if self.args.min_fixed > 1 else ''
+        path = self.config.baseline_path
+        count = self.args.min_fixed
+        msg = f"""
+            ## mypy-baseline suggest
+
+            Please, resolve at least {count} error{s} from `{path}`. Suggested:
+
+            ```
+            {err_msg}
+            ```
+        """
+
+        # send the request
+        resp = requests.post(
+            url=self._gitlab_comment_url,
+            json={'body': dedent(msg)},
+            headers={'PRIVATE-TOKEN': token},
+        )
+        resp.raise_for_status()
+
+    def _check_gitlab_has_comment(self, token: str) -> bool:
+        """Check if mypy-baseline already left a comment in the MR.
+        """
+        import requests
+
+        resp = requests.get(self._gitlab_comment_url)
+        if not resp.ok:
+            return False
+        for comment in resp.json():
+            body: str = comment['body'].strip()
+            if body.startswith('## mypy-baseline suggest'):
+                return True
+        return False
+
+    @cached_property
+    def _gitlab_comment_url(self) -> str:
+        """GitLab API endpoint to work with MR comments.
+        """
+        base_url = os.environ['CI_API_V4_URL']
+        project_id = os.environ['CI_MERGE_REQUEST_PROJECT_ID']
+        mr_id = os.environ['CI_MERGE_REQUEST_IID']
+        return f'{base_url}/projects/{project_id}/merge_requests/{mr_id}/notes'
