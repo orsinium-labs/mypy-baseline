@@ -21,6 +21,16 @@ When mypy-baseline tells you that you introduced new errors and you need to reso
 1. Run `mypy-baseline top-files`. These are the files that need the most attention. Either they have lots of problems, or there is a small error (like a wrong annotation for a base class method) that causes a cascade of type violations and so fixing it would be a quick win.
 1. Don't forget to run `mypy | mypy-baseline sync` when you finish.
 
+## Resolve suggested errors
+
+If your team uses [mypy-baseline suggest](./suggest.md) on CI, you may get in your MRs suggestions from mypy-baseline on what errors to resolve.
+
+1. Copy the suggested error.
+1. Open the baseline file mentioned in the comment (`mypy-baseline.txt` by default).
+1. Find and remove the suggested error from the file and save the changes.
+1. Run `mypy | mypy-baseline filter` and it should show you that error with the correct line number.
+1. Go to the reported line of code and solve the issue.
+
 ## Keep mypy-baseline in sync
 
 1. By default, mypy-baseline will fail if there are resolved but unsynced errors. The reason for that is to keep `mypy-baseline.txt` always up-to-date. If you don't do that, it will be hard for others to see what errors their changes resolved. Think about others.
