@@ -201,10 +201,11 @@ class Suggest(Command):
         # form the message
         s = 's' if self.args.min_fixed > 1 else ''
         path = self.config.baseline_path
+        count = self.args.min_fixed
         msg = f"""
             ## mypy-baseline suggest
 
-            Please, resolve {self.args.min_fixed}+ error{s} from `{path}`. Suggested:
+            Please, resolve at least {count} error{s} from `{path}`. Suggested:
 
             ```
             {err_msg}
@@ -212,11 +213,12 @@ class Suggest(Command):
         """
 
         # send the request
-        requests.post(
+        resp = requests.post(
             url=self._gitlab_comment_url,
             json={'body': dedent(msg)},
             headers={'PRIVATE-TOKEN': token},
         )
+        resp.raise_for_status()
 
     def _check_gitlab_has_comment(self, token: str) -> bool:
         """Check if mypy-baseline already left a comment in the MR.
