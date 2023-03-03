@@ -226,11 +226,12 @@ class Suggest(Command):
         import requests
 
         resp = requests.get(self._gitlab_comment_url)
-        if not resp.ok:
-            return False
+        resp.raise_for_status()
+        # if not resp.ok:
+        #     return False
         for comment in resp.json():
             body: str = comment['body'].strip()
-            if body.lstrip().startswith('## mypy-baseline suggest'):
+            if body.startswith('## mypy-baseline suggest'):
                 return True
         return False
 
