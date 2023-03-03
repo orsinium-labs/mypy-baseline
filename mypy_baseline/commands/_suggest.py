@@ -230,7 +230,7 @@ class Suggest(Command):
             return False
         for comment in resp.json():
             body: str = comment['body'].strip()
-            if body.startswith('## mypy-baseline suggest'):
+            if body.lstrip().startswith('## mypy-baseline suggest'):
                 return True
         return False
 
