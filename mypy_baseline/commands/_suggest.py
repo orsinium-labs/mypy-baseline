@@ -225,10 +225,11 @@ class Suggest(Command):
         """
         import requests
 
-        resp = requests.get(self._gitlab_comment_url)
+        resp = requests.get(
+            url=self._gitlab_comment_url,
+            headers={'PRIVATE-TOKEN': token},
+        )
         resp.raise_for_status()
-        # if not resp.ok:
-        #     return False
         for comment in resp.json():
             body: str = comment['body'].strip()
             if body.startswith('## mypy-baseline suggest'):
