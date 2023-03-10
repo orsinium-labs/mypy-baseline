@@ -226,7 +226,7 @@ class Suggest(Command):
         import requests
 
         resp = requests.get(
-            url=self._gitlab_comment_url,
+            url=f'{self._gitlab_comment_url}?sort=asc&per_page=100',
             headers={'PRIVATE-TOKEN': token},
         )
         resp.raise_for_status()
