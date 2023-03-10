@@ -14,7 +14,7 @@ from responses import RequestsMock
 from mypy_baseline._config import Config
 from mypy_baseline.commands import Suggest
 
-from .helpers import LINE1, run
+from .helpers import LINE1, LINE2, run
 
 
 @contextmanager
@@ -60,6 +60,21 @@ def test_suggest(repo_path: Path):
     cmd = ['suggest', '--baseline-path', str(bline_path)]
     stdout = run(cmd, exit_code=1)
     assert stdout.strip() == LINE1.strip()
+
+
+def test_fixed_and_committed(repo_path: Path):
+    """If there are committed fixes in the baseline, don't suggest.
+    """
+    bline_path = repo_path / 'baseline.txt'
+    bline_path.write_text(f'{LINE1}\n{LINE2}')
+    run_git('add', str(bline_path))
+    run_git('commit', '-m', 'init')
+    run_git('checkout', '-b', 'feature-branch')
+    bline_path.write_text(LINE1)
+    run_git('commit', '-am', 'fix bline')
+    cmd = ['suggest', '--baseline-path', str(bline_path)]
+    stdout = run(cmd, exit_code=0)
+    assert stdout.strip() == ''
 
 
 def test_target_branch__cli_flag():
