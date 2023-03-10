@@ -102,7 +102,7 @@ class Suggest(Command):
         """Get number of baseline violations fixed in this PR.
         """
         lines = self._get_stdout(
-            'diff', 'HEAD', self.target, '--',
+            'diff', self.target, 'HEAD', '--',
             str(self.config.baseline_path),
         )
         count = 0
