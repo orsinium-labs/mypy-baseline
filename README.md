@@ -39,6 +39,21 @@ After that, you can pipe mypy output into `mypy-baseline filter`, and it will fi
 mypy | mypy-baseline filter
 ```
 
+### Usage with Jupyter notebooks
+
+Jupyter notebooks can be checked with [nbQA](https://github.com/nbQA-dev/nbQA)
+Simply run
+
+```bash
+nbqa mypy <directory> | mypy-baseline <command>
+```
+
+e.g.
+
+```bash
+nbqa mypy . | mypy-baseline filter
+```
+
 If you introduce new errors, resolve them. If you resolve existing errors, run `mypy-baseline sync` again to re-generate baseline. In both cases, mypy-baseline will tell you what's wrong and what to do. Enjoy the ride!
 
 Read more in the documentation: [mypy-baseline.orsinium.dev](https://mypy-baseline.orsinium.dev/)
