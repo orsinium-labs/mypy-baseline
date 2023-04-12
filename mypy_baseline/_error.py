@@ -48,7 +48,6 @@ class Error:
         
         if match is None:
             return None
-        print(match.group('lineno'))
 
         return Error(line, match)
 
