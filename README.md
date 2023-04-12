@@ -54,6 +54,12 @@ e.g.
 nbqa mypy . | mypy-baseline filter
 ```
 
+To baseline both Jupyter notebooks and .py files run
+
+```bash
+(mypy .; nbqa mypy .) | mypy-baseline sync
+```
+
 If you introduce new errors, resolve them. If you resolve existing errors, run `mypy-baseline sync` again to re-generate baseline. In both cases, mypy-baseline will tell you what's wrong and what to do. Enjoy the ride!
 
 Read more in the documentation: [mypy-baseline.orsinium.dev](https://mypy-baseline.orsinium.dev/)
