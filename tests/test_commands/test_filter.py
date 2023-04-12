@@ -4,7 +4,7 @@ from io import StringIO
 
 from mypy_baseline import main
 
-from .helpers import LINE1, LINE2, run, NOTEBOOK_LINE1, NOTEBOOK_LINE1_EXPECTED
+from .helpers import LINE1, LINE2, NOTEBOOK_LINE1, run
 
 
 def test_filter():
@@ -23,11 +23,12 @@ def test_filter():
     assert '  union-attr  ' in actual
     assert '  unresolved' in actual
     assert 'Your changes introduced' in actual
-    
+
+
 def test_filter_notebook():
     stdin = StringIO()
     stdin.write(NOTEBOOK_LINE1)
-    
+
     stdin.seek(0)
     stdout = StringIO()
     code = main(['filter'], stdin, stdout)

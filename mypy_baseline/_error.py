@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ._config import Config
 
 COLOR_PATTERN = '(\x1b\\[\\d*m?|\x0f)*'
-COLOR_PATTERN_NBQA = "\[\d*m|\\x1b|\(B"
+COLOR_PATTERN_NBQA = '\\[\\d*m|\\x1b|\\(B'
 REX_COLOR = re.compile(COLOR_PATTERN)
 REX_COLOR_NBQA = re.compile(COLOR_PATTERN_NBQA)
 REX_LINE = re.compile(r"""
@@ -32,9 +32,11 @@ REX_LINE_NBQA = re.compile(r"""
 """, re.VERBOSE | re.MULTILINE)
 REX_LINE_IN_MSG = re.compile(r'defined on line \d+')
 
+
 def _remove_color_codes(line: str) -> str:
-    line = REX_COLOR.sub("", line)
-    return REX_COLOR_NBQA.sub( "", line)
+    line = REX_COLOR.sub('', line)
+    return REX_COLOR_NBQA.sub('', line)
+
 
 @dataclass
 class Error:
@@ -45,7 +47,7 @@ class Error:
     def new(self, line: str) -> Error | None:
         line = _remove_color_codes(line)
         match = REX_LINE.fullmatch(line) or REX_LINE_NBQA.fullmatch(line)
-        
+
         if match is None:
             return None
 
