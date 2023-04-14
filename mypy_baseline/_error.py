@@ -10,17 +10,30 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._config import Config
 
-COLOR_PATTERN = '(\x1b\\[\\d*m?|\x0f)*'
-REX_COLOR = re.compile(COLOR_PATTERN)
-REX_LINE = re.compile(rf"""
+REX_COLOR = re.compile('(\x1b\\[\\d*m?|\x0f)*')
+REX_COLOR_NBQA = re.compile(r'\[\d*m|\x1b|\(B')
+REX_LINE = re.compile(r"""
     (?P<path>.+\.py):
     (?P<lineno>[0-9]+):\s
-    {COLOR_PATTERN}(?P<severity>[a-z]+):{COLOR_PATTERN}\s
+    (?P<severity>[a-z]+):\s
     (?P<message>.+?)
-    (?:\s\s{COLOR_PATTERN}\[(?P<category>[a-z-]+)\]{COLOR_PATTERN})?
+    (?:\s\s\[(?P<category>[a-z-]+)\])?
+    \s*
+""", re.VERBOSE | re.MULTILINE)
+REX_LINE_NBQA = re.compile(r"""
+    (?P<path>.+\.ipynb:cell_[0-9]+):
+    (?P<lineno>[0-9]+):\s
+    (?P<severity>[a-z]+):\s
+    (?P<message>.+?)
+    (?:\s\s\[(?P<category>[a-z-]+)\])?
     \s*
 """, re.VERBOSE | re.MULTILINE)
 REX_LINE_IN_MSG = re.compile(r'defined on line \d+')
+
+
+def _remove_color_codes(line: str) -> str:
+    line = REX_COLOR.sub('', line)
+    return REX_COLOR_NBQA.sub('', line)
 
 
 @dataclass
@@ -30,7 +43,8 @@ class Error:
 
     @classmethod
     def new(self, line: str) -> Error | None:
-        match = REX_LINE.fullmatch(line)
+        line = _remove_color_codes(line)
+        match = REX_LINE.fullmatch(line) or REX_LINE_NBQA.fullmatch(line)
         if match is None:
             return None
         return Error(line, match)
@@ -61,6 +75,7 @@ class Error:
         path = Path(*self.path.parts[:config.depth])
         pos = self.line_number if config.preserve_position else 0
         msg = REX_COLOR.sub('', self.message).strip()
+        msg = REX_COLOR_NBQA.sub('', self.message).strip()
         msg = REX_LINE_IN_MSG.sub('defined on line 0', msg)
         line = f'{path}:{pos}: {self.severity}: {msg}'
         if self.category != 'note':
