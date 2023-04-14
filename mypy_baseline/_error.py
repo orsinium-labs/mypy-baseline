@@ -10,10 +10,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._config import Config
 
-COLOR_PATTERN = '(\x1b\\[\\d*m?|\x0f)*'
-COLOR_PATTERN_NBQA = '\\[\\d*m|\\x1b|\\(B'
-REX_COLOR = re.compile(COLOR_PATTERN)
-REX_COLOR_NBQA = re.compile(COLOR_PATTERN_NBQA)
+REX_COLOR = re.compile('(\x1b\\[\\d*m?|\x0f)*')
+REX_COLOR_NBQA = re.compile(r'\[\d*m|\x1b|\(B')
 REX_LINE = re.compile(r"""
     (?P<path>.+\.py):
     (?P<lineno>[0-9]+):\s
@@ -47,10 +45,8 @@ class Error:
     def new(self, line: str) -> Error | None:
         line = _remove_color_codes(line)
         match = REX_LINE.fullmatch(line) or REX_LINE_NBQA.fullmatch(line)
-
         if match is None:
             return None
-
         return Error(line, match)
 
     @cached_property
