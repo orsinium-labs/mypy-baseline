@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ._config import Config
 
 REX_COLOR = re.compile('(\x1b\\[\\d*m?|\x0f)*')
-REX_COLOR_NBQA = re.compile(r'\[\d*m|\x1b|\(B')
+REX_COLOR_NBQA = re.compile(r'\[\d*\x1bm|\x1b|\(B')
 REX_LINE = re.compile(r"""
     (?P<path>.+\.py):
     (?P<lineno>[0-9]+):\s
