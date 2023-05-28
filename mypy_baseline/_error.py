@@ -75,7 +75,7 @@ class Error:
         path = Path(*self.path.parts[:config.depth])
         pos = self.line_number if config.preserve_position else 0
         msg = REX_COLOR.sub('', self.message).strip()
-        msg = REX_COLOR_NBQA.sub('', self.message).strip()
+        msg = REX_COLOR_NBQA.sub('', msg).strip()
         msg = REX_LINE_IN_MSG.sub('defined on line 0', msg)
         line = f'{path}:{pos}: {self.severity}: {msg}'
         if self.category != 'note':
