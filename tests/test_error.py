@@ -30,3 +30,19 @@ def test_line2_parse():
     assert e.message == 'This violates the Liskov substitution principle'
     assert e.category == 'note'
     assert e.get_clean_line(Config()) == LINE2EXP
+
+
+# pyi files
+LINE3 = 'my_project/api/views.pyi:0: note: This violates the Liskov substitution principle\r\n'  # noqa
+LINE3EXP = 'my_project/api/views.pyi:0: note: This violates the Liskov substitution principle'  # noqa
+
+
+def test_line3_parse():
+    e = Error.new(LINE3)
+    assert e is not None
+    assert e.path.parts == ('my_project', 'api', 'views.pyi')
+    assert e.line_number == 0
+    assert e.severity == 'note'
+    assert e.message == 'This violates the Liskov substitution principle'
+    assert e.category == 'note'
+    assert e.get_clean_line(Config()) == LINE3EXP
