@@ -1,6 +1,6 @@
 # mypy-baseline
 
-A CLI tool for painless integration of mypy with an existing Python project. When you run it for the first time, it will remember all type errors that you already have in the project (generate "baseline"). All consequentive runs will ignore these errors and report only ones that you introduced after that.
+A CLI tool for painless integration of mypy with an existing Python project. When you run it for the first time, it will remember all type errors that you already have in the project (generate "baseline"). All consecutive runs will ignore these errors and report only ones that you introduced after that.
 
 Additionally, the tool will show you what progress you made since the last baseline, to encourage your team to resolve mypy errors:
 
@@ -17,7 +17,7 @@ Features:
 + Baseline is carefully crafted to avoid merge conflicts.
 + Baseline is human-readable, and diffs are informative. The reviewers of your PR will know exactly what errors you resolve and what errors you introduced.
 + Track the progress you make with git-based history of changes and burndown chart of resolved type violations.
-+ Ignore speicific error messages (using regular expressions), so that buggy mypy plugins don't bother you with false-positives.
++ Ignore specific error messages (using regular expressions) and error categories, so that buggy mypy plugins don't bother you with false-positives.
 
 ## Installation
 
