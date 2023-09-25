@@ -37,7 +37,10 @@ class Filter(Command):
                 unresolved_errors.append(error)
 
         fixed_errors: list[Error] = []
+
         for line in baseline:
+            if not line:  # Skip empty lines
+                continue
             error = Error.new(line)
             if error is None:
                 print(f'invalid baseline, cannot parse line: {line}')
