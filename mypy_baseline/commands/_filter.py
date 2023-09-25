@@ -37,13 +37,15 @@ class Filter(Command):
                 unresolved_errors.append(error)
 
         fixed_errors: list[Error] = []
-        if baseline != [""]: # When there are no errors, baseline is empty
-            for line in baseline:
-                error = Error.new(line)
-                if error is None:
-                    print(f'invalid baseline, cannot parse line: {line}')
-                    return 1
-                fixed_errors.append(error)
+
+        for line in baseline:
+            if not line:  # Skip empty lines
+                continue
+            error = Error.new(line)
+            if error is None:
+                print(f'invalid baseline, cannot parse line: {line}')
+                return 1
+            fixed_errors.append(error)
 
         fixed_count = len(fixed_errors)
         new_count = len(new_errors)
