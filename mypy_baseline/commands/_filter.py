@@ -27,6 +27,8 @@ class Filter(Command):
                 continue
             if self.config.is_ignored(error.message):
                 continue
+            if self.config.is_ignored_category(error.category):
+                continue
             clean_line = error.get_clean_line(self.config)
             try:
                 baseline.remove(clean_line)

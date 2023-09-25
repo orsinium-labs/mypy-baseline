@@ -31,6 +31,28 @@ def test_filter():
     assert 'Your changes introduced' in actual
 
 
+def test_filter__ignore_category():
+    stdin = StringIO()
+    stdin.write(LINE_WITH_NOTE)
+    stdin.seek(0)
+    stdout = StringIO()
+    code = main(['filter', '--ignore-categories', 'note'], stdin, stdout)
+    assert code == 0
+    actual = stdout.getvalue()
+    assert actual == ''
+
+
+def test_filter__ignore():
+    stdin = StringIO()
+    stdin.write(LINE3)
+    stdin.seek(0)
+    stdout = StringIO()
+    code = main(['filter', '--ignore', '.*Enum.*'], stdin, stdout)
+    assert code == 0
+    actual = stdout.getvalue()
+    assert actual == ''
+
+
 def test_filter_notebook():
     stdin = StringIO()
     stdin.write(NOTEBOOK_LINE1)

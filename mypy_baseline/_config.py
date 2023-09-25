@@ -20,7 +20,7 @@ except ImportError:
     try:
         import tomllib as tomli  # type: ignore
     except ImportError:
-        tomli = None   # type: ignore[assignment]
+        tomli = None  # type: ignore[assignment]
 
 
 @dataclasses.dataclass
@@ -32,6 +32,7 @@ class Config:
     hide_stats: bool = False
     no_colors: bool = bool(os.environ.get('NO_COLOR'))
     ignore: list[str] = dataclasses.field(default_factory=list)
+    ignore_categories: list[str] = dataclasses.field(default_factory=list)
     default_branch: str = ''
 
     @classmethod
@@ -77,7 +78,11 @@ class Config:
         )
         add(
             '--ignore', nargs='*',
-            help='regexes for messages to ignore.',
+            help='regexes for messages to ignore, e.g. ".*Enum.*"',
+        )
+        add(
+            '--ignore-categories', nargs='*',
+            help='categories of mypy errors to ignore, e.g. "note" or "call-arg"',
         )
         add(
             '--default-branch',
@@ -131,3 +136,8 @@ class Config:
         """Check if the message matches any ignore pattern from the config.
         """
         return any(rex.fullmatch(msg) for rex in self._ignore_regexes)
+
+    def is_ignored_category(self, category: str) -> bool:
+        """Check if the category matches any ignore pattern from the config.
+        """
+        return category in self.ignore_categories

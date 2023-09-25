@@ -23,6 +23,8 @@ class Sync(Command):
                 continue
             if self.config.is_ignored(error.message):
                 continue
+            if self.config.is_ignored_category(error.category):
+                continue
             clean_line = error.get_clean_line(self.config)
             new_baseline.append(clean_line)
 
