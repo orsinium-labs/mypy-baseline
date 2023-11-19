@@ -20,6 +20,15 @@ REX_LINE = re.compile(r"""
     (?:\s\s\[(?P<category>[a-z-]+)\])?
     \s*
 """, re.VERBOSE | re.MULTILINE)
+REX_LINE_COLUMN = re.compile(r"""
+    (?P<path>.+\.pyi?):
+    (?P<lineno>[0-9]+):
+    (?P<columnno>[0-9]+):\s
+    (?P<severity>[a-z]+):\s
+    (?P<message>.+?)
+    (?:\s\s\[(?P<category>[a-z-]+)\])?
+    \s*
+""", re.VERBOSE | re.MULTILINE)
 REX_LINE_NBQA = re.compile(r"""
     (?P<path>.+\.ipynb:cell_[0-9]+):
     (?P<lineno>[0-9]+):\s
@@ -44,7 +53,7 @@ class Error:
     @classmethod
     def new(self, line: str) -> Error | None:
         line = _remove_color_codes(line)
-        match = REX_LINE.fullmatch(line) or REX_LINE_NBQA.fullmatch(line)
+        match = REX_LINE.fullmatch(line) or REX_LINE_NBQA.fullmatch(line) or REX_LINE_COLUMN.fullmatch(line)
         if match is None:
             return None
         return Error(line, match)
