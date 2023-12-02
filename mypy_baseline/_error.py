@@ -20,6 +20,14 @@ REX_LINE = re.compile(r"""
     (?:\s\s\[(?P<category>[a-z-]+)\])?
     \s*
 """, re.VERBOSE | re.MULTILINE)
+REX_LINE = re.compile(r"""
+    (?P<path>.+\.pyi?):
+    (?P<lineno>[0-9]+):(?:[0-9]+:)?\s
+    (?P<severity>[a-z]+):\s
+    (?P<message>.+?)
+    (?:\s\s\[(?P<category>[a-z-]+)\])?
+    \s*
+""", re.VERBOSE | re.MULTILINE)
 REX_LINE_NBQA = re.compile(r"""
     (?P<path>.+\.ipynb:cell_[0-9]+):
     (?P<lineno>[0-9]+):\s

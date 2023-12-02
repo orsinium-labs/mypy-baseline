@@ -46,3 +46,18 @@ def test_line3_parse():
     assert e.message == 'This violates the Liskov substitution principle'
     assert e.category == 'note'
     assert e.get_clean_line(Config()) == LINE3EXP
+
+# --show-column-numbers files
+LINE4 = 'my_project/api/views.py:10:42: note: This violates the Liskov substitution principle\r\n'  # noqa
+LINE4EXP = 'my_project/api/views.py:0: note: This violates the Liskov substitution principle'  # noqa
+
+
+def test_line4_parse():
+    e = Error.new(LINE4)
+    assert e is not None
+    assert e.path.parts == ('my_project', 'api', 'views.py')
+    assert e.line_number == 10
+    assert e.severity == 'note'
+    assert e.message == 'This violates the Liskov substitution principle'
+    assert e.category == 'note'
+    assert e.get_clean_line(Config()) == LINE4EXP
