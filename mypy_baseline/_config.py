@@ -29,6 +29,7 @@ class Config:
     depth: int = 40
     allow_unsynced: bool = False
     preserve_position: bool = False
+    sort_baseline: bool = False
     hide_stats: bool = False
     no_colors: bool = bool(os.environ.get('NO_COLOR'))
     ignore: list[str] = dataclasses.field(default_factory=list)
@@ -67,6 +68,10 @@ class Config:
         add(
             '--preserve-position', action='store_true',
             help='do not remove line number from the baseline.',
+        )
+        add(
+            '--sort-baseline', action='store_true',
+            help='sort the baseline file.',
         )
         add(
             '--hide-stats', action='store_true',
