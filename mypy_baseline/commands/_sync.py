@@ -28,6 +28,9 @@ class Sync(Command):
             clean_line = error.get_clean_line(self.config)
             new_baseline.append(clean_line)
 
+        if self.config.sort_baseline:
+            new_baseline.sort()
+
         synced = False
         if old_baseline:
             synced = self._stable_sync(old_baseline, new_baseline)
@@ -44,9 +47,13 @@ class Sync(Command):
         Currently, we can do a stable sync only when there are no new lines added.
         It's hard to insert new lines in the correct positions, and adding them
         at the end of the file will cause merge conflicts.
-        Sorting lines alphabetically would solve the issue, but I want to keep
-        backward compatibility.
+        Sorting lines solves the issue, so we don't use stable sync when the output
+        is sorted.
+        However, sorting is not enabled by default because I want to keep backward
+        compatibility.
         """
+        if not self.config.sort_baseline:
+            return False
         old_set = set(old_bline)
         new_set = set(new_bline)
         removed = old_set - new_set

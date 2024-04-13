@@ -34,3 +34,19 @@ def test_sync_notebook(tmp_path: Path):
     actual = blpath.read_text()
     line1 = actual.splitlines()[0]
     assert line1 == 'fail.ipynb:cell_1:0: error: Incompatible return value type (got "int", expected "str")  [return-value]'  # noqa: E501
+
+
+def test_sync_sorted(tmp_path: Path):
+    blpath = tmp_path / 'bline.txt'
+    stdin = StringIO()
+    stdin.write(LINE1)
+    stdin.write(LINE2)
+    stdin.write(LINE3)
+    stdin.seek(0)
+    code = main(['sync', '--sort-baseline', '--baseline-path', str(blpath)], stdin, StringIO())  # noqa: E501
+    assert code == 0
+    actual = blpath.read_text()
+    line1, line2, line3 = actual.splitlines()
+    assert line1 == 'python/utils.py:0: error: Second argument of Enum() must be string  [misc]'  # noqa: E501s
+    assert line2 == 'settings.py:0: error: How are you?  [union-attr]'
+    assert line3 == 'views.py:0: error: Hello world  [assignment]'
