@@ -80,7 +80,7 @@ class Error:
         return self._match.group('category') or 'note'
 
     def get_clean_line(self, config: Config) -> str:
-        path = Path(*self.path.parts[:config.depth])
+        path = str(Path(*self.path.parts[:config.depth])).replace('\\', '/')
         pos = self.line_number if config.preserve_position else 0
         msg = REX_COLOR.sub('', self.message).strip()
         msg = REX_COLOR_NBQA.sub('', msg).strip()
