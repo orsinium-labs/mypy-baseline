@@ -4,10 +4,8 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "mypy_baseline"
-authors = [
-    {name = "Gram", email = "git@orsinium.dev"},
-]
-license = {file = "LICENSE"}
+authors = [{ name = "Gram", email = "git@orsinium.dev" }]
+license = { file = "LICENSE" }
 readme = "README.md"
 requires-python = ">=3.8"
 dynamic = ["version", "description"]
@@ -18,33 +16,13 @@ classifiers = [
     "Programming Language :: Python",
     "Typing :: Typed",
 ]
-keywords = [
-    "mypy",
-    "typing",
-    "annotations",
-    "type annotations",
-]
+keywords = ["mypy", "baseline", "typing", "annotations", "type annotations"]
 dependencies = []
 
 [project.optional-dependencies]
-test = [
-    "pytest",
-    "pytest-cov",
-    "requests",
-    "responses",
-]
-lint = [
-    "flake8",
-    "isort",
-    "mypy",
-    "types-requests",
-    "types-toml",
-    "unify",
-]
-docs = [
-    "sphinx",
-    "myst-parser",
-]
+test = ["pytest", "pytest-cov", "requests", "responses"]
+lint = ["flake8", "isort", "mypy", "types-requests", "types-toml", "unify"]
+docs = ["sphinx", "myst-parser"]
 
 
 [project.urls]
@@ -55,7 +33,7 @@ mypy-baseline = "mypy_baseline:entrypoint"
 
 [tool.mypy]
 files = ["mypy_baseline", "tests"]
-python_version = 3.8
+python_version = "3.8"
 ignore_missing_imports = true
 # follow_imports = "silent"
 show_error_codes = true
