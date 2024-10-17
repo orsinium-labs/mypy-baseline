@@ -62,23 +62,23 @@ class Config:
         )
 
         add(
-            '--allow-unsynced', action='store_true',
+            '--allow-unsynced', action='store_const', const=True,
             help='do not fail for resolved violations.'
         )
         add(
-            '--preserve-position', action='store_true',
+            '--preserve-position', action='store_const', const=True,
             help='do not remove line number from the baseline.',
         )
         add(
-            '--sort-baseline', action='store_true',
+            '--sort-baseline', action='store_const', const=True,
             help='sort the baseline file.',
         )
         add(
-            '--hide-stats', action='store_true',
+            '--hide-stats', action='store_const', const=True,
             help='do not show stats at the end.',
         )
         add(
-            '--no-colors', action='store_true',
+            '--no-colors', action='store_const', const=True,
             help='disable colored output. Has no effect on the output of mypy.',
         )
         add(
