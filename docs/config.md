@@ -20,4 +20,8 @@ no_colors = false
 ignore = []
 # --ignore-categories: categories of mypy errors to ignore, e.g. "note" or "call-arg"
 ignore_categories = []
+# --sort-baseline: sort the baseline file
+sort_baseline = false
+# --default-branch: default git branch name
+default_branch = ''
 ```
