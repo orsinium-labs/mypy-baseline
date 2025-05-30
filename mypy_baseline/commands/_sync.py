@@ -52,7 +52,7 @@ class Sync(Command):
         However, sorting is not enabled by default because I want to keep backward
         compatibility.
         """
-        if not self.config.sort_baseline:
+        if self.config.sort_baseline:
             return False
         old_set = set(old_bline)
         new_set = set(new_bline)
