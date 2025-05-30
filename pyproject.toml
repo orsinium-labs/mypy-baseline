@@ -7,7 +7,7 @@ name = "mypy_baseline"
 authors = [{ name = "Gram", email = "git@orsinium.dev" }]
 license = { file = "LICENSE" }
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dynamic = ["version", "description"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -21,7 +21,7 @@ dependencies = []
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "requests", "responses"]
-lint = ["flake8", "isort", "mypy", "types-requests", "types-toml", "unify"]
+lint = ["flake8", "isort", "mypy", "types-requests", "types-toml"]
 docs = ["sphinx", "myst-parser"]
 
 
@@ -33,7 +33,7 @@ mypy-baseline = "mypy_baseline:entrypoint"
 
 [tool.mypy]
 files = ["mypy_baseline", "tests"]
-python_version = "3.8"
+python_version = "3.9"
 ignore_missing_imports = true
 # follow_imports = "silent"
 show_error_codes = true

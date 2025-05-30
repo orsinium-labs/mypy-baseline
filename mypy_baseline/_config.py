@@ -18,9 +18,9 @@ try:
 except ImportError:
     # https://peps.python.org/pep-0680/
     try:
-        import tomllib as tomli  # type: ignore
+        import tomllib as tomli
     except ImportError:
-        tomli = None  # type: ignore[assignment]
+        tomli = None
 
 
 @dataclasses.dataclass
