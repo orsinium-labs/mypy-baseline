@@ -21,7 +21,7 @@ dependencies = []
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "requests", "responses"]
-lint = ["flake8", "isort", "mypy", "types-requests", "types-toml", "unify"]
+lint = ["flake8", "isort", "mypy", "types-requests", "types-toml"]
 docs = ["sphinx", "myst-parser"]
 
 
