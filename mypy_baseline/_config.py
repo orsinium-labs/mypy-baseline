@@ -35,6 +35,7 @@ class Config:
     ignore: list[str] = dataclasses.field(default_factory=list)
     ignore_categories: list[str] = dataclasses.field(default_factory=list)
     default_branch: str = ''
+    ignore_non_errors: bool = False
 
     @classmethod
     def from_args(cls, args: dict[str, Any]) -> Config:
@@ -92,6 +93,10 @@ class Config:
         add(
             '--default-branch',
             help='default git branch name.',
+        )
+        add(
+            '--ignore-non-errors', action='store_true',
+            help='ignore non-errors when outputting and filtering the output.'
         )
 
     def read_file(self, path: Path) -> Config:

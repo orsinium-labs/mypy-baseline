@@ -23,7 +23,8 @@ class Filter(Command):
         for line in self.stdin:
             error = Error.new(line)
             if error is None:
-                self.print(line, end='')
+                if not self.config.ignore_non_errors:
+                    self.print(line, end='')
                 continue
             if self.config.is_ignored(error.message):
                 continue
