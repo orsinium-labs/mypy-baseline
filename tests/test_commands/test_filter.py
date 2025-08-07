@@ -82,3 +82,37 @@ def test_filter_success():
     assert code == 0
     actual = stdout.getvalue()
     assert actual == SUCCESS_LINE
+
+
+def test_filter__add_baseline_file_if_missing_then_fail(tmp_path):
+    baseline_path = tmp_path / 'test-baseline.txt'
+    stdin = StringIO()
+    stdin.write(LINE1)
+    stdin.write(LINE2)
+    stdin.seek(0)
+    stdout = StringIO()
+    code = main(['filter', '--baseline-path', str(baseline_path), '--add-baseline-file-if-missing-then-fail'], stdin, stdout)
+    assert code == 1
+    actual = stdout.getvalue()
+    assert f'Created baseline file: {baseline_path}' in actual
+    
+    # Check that baseline file was created with correct content
+    assert baseline_path.exists()
+    baseline_content = baseline_path.read_text(encoding='utf8')
+    assert 'views.py:0: error: Hello world  [assignment]' in baseline_content
+    assert 'settings.py:0: error: How are you?  [union-attr]' in baseline_content
+
+
+def test_filter__add_baseline_file_if_missing_then_fail_with_existing_file(tmp_path):
+    baseline_path = tmp_path / 'test-baseline.txt'
+    baseline_path.write_text('views.py:0: error: Hello world  [assignment]\n', encoding='utf8')
+    
+    stdin = StringIO()
+    stdin.write(LINE1)
+    stdin.seek(0)
+    stdout = StringIO()
+    code = main(['filter', '--baseline-path', str(baseline_path), '--add-baseline-file-if-missing-then-fail'], stdin, stdout)
+    assert code == 0
+    actual = stdout.getvalue()
+    assert 'Created baseline file:' not in actual
+    assert 'unresolved:' in actual

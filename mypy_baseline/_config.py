@@ -35,6 +35,7 @@ class Config:
     ignore: list[str] = dataclasses.field(default_factory=list)
     ignore_categories: list[str] = dataclasses.field(default_factory=list)
     default_branch: str = ''
+    add_baseline_file_if_missing_then_fail: bool = False
 
     @classmethod
     def from_args(cls, args: dict[str, Any]) -> Config:
@@ -92,6 +93,10 @@ class Config:
         add(
             '--default-branch',
             help='default git branch name.',
+        )
+        add(
+            '--add-baseline-file-if-missing-then-fail', action='store_true',
+            help='create the baseline file if it does not exist, then fail.',
         )
 
     def read_file(self, path: Path) -> Config:
