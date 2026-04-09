@@ -14,14 +14,6 @@ REX_COLOR = re.compile('(\x1b\\[\\d*m?|\x0f)*')
 REX_COLOR_NBQA = re.compile(r'\[\d*\x1bm|\x1b|\(B')
 REX_LINE = re.compile(r"""
     (?P<path>.+\.pyi?):
-    (?P<lineno>[0-9]+):\s
-    (?P<severity>[a-z]+):\s
-    (?P<message>.+?)
-    (?:\s\s\[(?P<category>[a-z-]+)\])?
-    \s*
-""", re.VERBOSE | re.MULTILINE)
-REX_LINE = re.compile(r"""
-    (?P<path>.+\.pyi?):
     (?P<lineno>[0-9]+):(?:[0-9]+:)?\s
     (?P<severity>[a-z]+):\s
     (?P<message>.+?)
