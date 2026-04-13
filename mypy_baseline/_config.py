@@ -103,8 +103,7 @@ class Config:
             with path.open('rb') as stream:
                 data = tomli.load(stream)
         elif toml is not None:
-            with path.open('rb', encoding='utf8') as stream:
-                data = dict(toml.load(stream))
+            data = dict(toml.load(path))
         else:
             return self
 
