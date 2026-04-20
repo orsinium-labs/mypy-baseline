@@ -11,14 +11,17 @@ class Filter(Command):
     """
 
     def run(self) -> int:
+        baseline_missing = False
         try:
             baseline_text = self.config.baseline_path.read_text(encoding='utf8')
         except FileNotFoundError:
+            baseline_missing = True
             baseline_text = ''
         baseline = baseline_text.splitlines()
 
         unresolved_errors: list[Error] = []
         new_errors: list[Error] = []
+        baseline_content: list[str] = []
 
         for line in self.stdin:
             error = Error.new(line)
@@ -30,6 +33,11 @@ class Filter(Command):
             if self.config.is_ignored_category(error.category):
                 continue
             clean_line = error.get_clean_line(self.config)
+            
+            if baseline_missing and self.config.add_baseline_file_if_missing_then_fail:
+                baseline_content.append(clean_line)
+                continue
+                
             try:
                 baseline.remove(clean_line)
             except ValueError:
@@ -37,6 +45,15 @@ class Filter(Command):
                 new_errors.append(error)
             else:
                 unresolved_errors.append(error)
+        
+        # If baseline was missing and flag is set, create it and fail
+        if baseline_missing and self.config.add_baseline_file_if_missing_then_fail:
+            baseline_text = '\n'.join(baseline_content)
+            if baseline_content:
+                baseline_text += '\n'
+            self.config.baseline_path.write_text(baseline_text, encoding='utf8')
+            self.print(f'Created baseline file: {self.config.baseline_path}')
+            return 1
 
         fixed_errors: list[Error] = []
 
